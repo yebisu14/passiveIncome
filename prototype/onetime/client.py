@@ -2,25 +2,17 @@
 
 import urllib.request
 import json
-from Crypto.PublicKey import RSA
-
+from hashlib
 
 """
 1. 購入リクエストの送信
-購入リクエストは、DMMの公開鍵を取得してくるフェーズと、コントラクトに書き込むフェーズからなる。
+購入リクエストは、コントラクトに書き込むフェーズからなる。
 """
 def sendPurchaseRequest():
-    # DMMの公開鍵を取得してくる
-    req = 'http://0.0.0.0:5000/pubkey.pem'
-    response = urllib.request.urlopen(req)
-    key = response.read()
+    # hash化
 
-    # 取得した公開鍵を利用して暗号化したUUIDをコントラクト上に載せる
-    pub_key = RSA.importKey(key, passphrase=None) 
-    euuid = pub_key.encrypt(12345678, 32)[0]
-    print(euuid)
-    
     # コントラクトに書き込む
+
 
     return euuid
 

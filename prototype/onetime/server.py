@@ -1,26 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from Crypto.PublicKey import RSA
-from Crypto import Random
-
-"""
-公開鍵の作成
-"""
-random_generator = Random.new().read
-sk = RSA.generate(1024, random_generator)
-pk = sk.publickey().exportKey(format='PEM', passphrase=None, pkcs=1)
+import hashlib
+import sqlite3
 
 app = Flask(__name__)
 
-"""
-ユーザからの購入リクエストをトリガーとし、
-公開鍵をユーザに返す
-"""
-@app.route('/pubkey.pem')
-def getPubKey():
-    return pk
+DB_NAME = "./data.db"
 
+"""
+ハッシュのラッパー
+あとでアルゴリズムを変更できるようにラップしておく
+"""
+def hash(x):
+    return hashlib.sha256(x).hexdigest()
 
 """
 ユーザからの閲覧リクエストを元に、
@@ -38,7 +31,34 @@ def req():
 
 """
 今オープンになっている動画一覧を返す
+データベースからサムネイルをひっぱてきて一覧にする
 """
+@app.route('/')
+def index():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    args = []
+    for row in cursor.execute("SELECT * FROM thumbnails"):
+        args.append(
+            {
+                'uri': row[1],
+                'huuid': str(hash(row[0].encode()))
+            }
+        )
+
+    return render_template('index.html', args = args)
+
+
+"""
+表示されているサムネイルをクリックされた時に呼ばれる
+閲覧リクエストに相当
+"""
+@app.route('/open')
+def request_watching():
+    huuid = request.args.get('huuid')
+
+    return "invalid"
+
 
 
 
