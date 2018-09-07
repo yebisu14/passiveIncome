@@ -100,19 +100,20 @@ def sendBroadcastRequest(contract, walletAddress, uri):
 
 
 # 配信者側テストコード
-"""
 # コントラクト初期化
 contract = initContract()
 # 自分のウォレットアドレス
 myAddr = Web3.toChecksumAddress("0xf17f52151ebef6c7334fad080c5704d77216b732") # accounts[1]
+#myAddr = Web3.toChecksumAddress("0xc5fdf4076b8f3a5357c5e395ab970b5b54098fef")
 # 自分の配信アドレス
 uri = "https://google.co.jp"
 # リクエストを送る
 sendBroadcastRequest(contract, myAddr, uri)
-"""
+
+
 
 # 閲覧者側テストコード
-
+"""
 # UUIDを生成
 uuidPurchase = makeUuid()
 # UUIDを保存
@@ -128,3 +129,4 @@ print("my_wallet_address", sellAddr)
 sendPurchaseRequest(contract, myAddr, sellAddr, uuidPurchase)
 # あるデバイスに対して閲覧リクエストを送る
 sendWatchingRequest(uuidPurchase, sellAddr)
+"""

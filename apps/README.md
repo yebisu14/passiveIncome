@@ -40,15 +40,14 @@ https://qiita.com/genzouw/items/35022fa96c120e67c637
 
 
 ### サムネイルテーブル
-static/img/thumbnails配下のサムネイルをUUIDと関連づける。
+static/img/thumbnails配下のサムネイルをdevice_wallet_addressと関連づける。
 
 ```
 CREATE TABLE thumbnails(
-    uuid TEXT PRIMARY KEY NOT NULL,
+    wallet_address TEXT PRIMARY KEY NOT NULL,
     image_uri TEXT
 )
 ```
-
 
 ### ブロードキャストURIテーブル
 ウォレットアドレスと配信URLを紐づける。

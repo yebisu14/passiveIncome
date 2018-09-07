@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 import sqlite3
 from web3 import Web3, HTTPProvider
 import json
+import urllib.request
 
 DB_NAME = "./data.db"
 
@@ -20,8 +21,16 @@ def initContract():
     return contract
 
 
-
-
+def saveQrCode(walleAddress):
+    url = 'https://chart.googleapis.com/chart'
+    params = {
+        'chs': '300x300',
+        'cht': 'qr',
+        'chl': walleAddress,
+        'choe': 'UTF-8'
+    }
+    req = '{}?{}'.format(url, urllib.parse.urlencode(params))
+    urllib.request.urlretrieve(req, 'static/img/qrcodes/{}.png'.format(walleAddress))
 
 
 app = Flask(__name__)
@@ -64,10 +73,14 @@ def request_watching():
 def request_broadcast():
     uri = request.args.get('uri')
     wallet_address = request.args.get('addr')
-    # DMMのサーバ上にあるDBにURIを登録
+    # アドレスからQRコードを作成
+    saveQrCode(wallet_address)
+    # DMMのサーバ上にあるDBにブロードキャストURIを登録
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('INSERT INTO broadcast_uris VALUES(?,?)', [wallet_address, uri])
+    # DMMのサーバ上にあるDBにサムネイルを登録
+    cursor.execute('INSERT INTO thumbnails VALUES(?,?)', [wallet_address, 'landmark_tower_tokyo.png'])
     conn.commit()
     conn.close()
     return "OK."
@@ -87,8 +100,9 @@ def index():
     for row in cursor.execute('SELECT * FROM thumbnails'):
         args.append(
             {
-                'uri': row[1],
-                'huuid': str(hash(row[0].encode())),
+                'wallet_address': row[0],
+                'uri_thumbnail': row[1],
+                'uri_qrcode': '{}.png'.format(row[0])
             }
         )
     conn.close()

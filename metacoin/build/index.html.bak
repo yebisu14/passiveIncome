@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="index.css">
+    </head>
+
+    <body>
+        <h1>管理画面 </h1>
+
+        <!-- 公開されている動画リストとその状態 -->
+
+
+    </body>
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+
+        /*
+        MetaMaskはインストールされている前提で行きます
+        window.addEventListener('load', function() {
+            if (typeof web3 !== 'undefined') {
+                window.web3 = new Web3(web3.currentProvider);
+                onlyRopstenTestNetwork(main);
+            } else {
+                document.write("Please install <a href="\"https://metamask.io/\"">MetaMask</a>.")
+            }
+        });
+        */
+
+
+        $(()=>{
+
+            /*
+                web3.ethにアクセスできない。
+                webのコンソールからなら行けるんだけど。
+                とりあえず固定アドレス使っちゃうよ。これならアクセスできるっぽいので。
+            */
+            //var defaultAccount = web3.eth.accounts[0];
+            var defaultAccount = "0x627306090abab3a6e1400e9345bc60c78a8bef57";
+            var contractAddress = '0xfb88de099e13c3ed21f80a7a1e49f8caecf10df6';
+            var abiArray = '[{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[],"name":"getBroadcastStatus","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"},{"name":"stat","type":"bool"}],"name":"setBroadcastStatus","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"stat","type":"bool"}],"name":"setBroadcastStatus","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"addr","type":"address"},{"name":"stat","type":"bool"}],"name":"setBroadcastStatusByOwner","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]';
+            var abiJson = JSON.parse(abiArray);
+            var contract = web3.eth.contract(abiJson).at(contractAddress);
+
+            var addrs = [
+                "0x627306090abab3a6e1400e9345bc60c78a8bef57", // 0
+                "0xf17f52151ebef6c7334fad080c5704d77216b732", // 1
+                "0xc5fdf4076b8f3a5357c5e395ab970b5b54098fef", // 2
+                "0x821aea9a577a9b44299b9c15c88cf3087f3b5544"  // 3
+            ];
+
+            /*
+                適当に初期データ作っちゃうよ
+            */
+            function initialize(){
+
+                //contract.setBroadcastStatus(addrs[0], true, err=>{
+                //    if(err) throw err;
+                //});
+
+                contract.setMyBroadcastStatus(true, err=>{
+                    if(err) throw err;
+                });
+
+                /*
+                contract.setBroadcastStatus(addrs[1], true, err=>{
+                    if(err) throw err;
+                });
+                contract.setBroadcastStatus(addrs[2], true, err=>{
+                    if(err) throw err;
+                });
+                */
+            }
+
+            initialize();
+
+            /*
+                状態リストを持ってきて表示してみる
+            */
+           function fetch(){
+                contract.getBroadcastStatus(addrs[0], (err, status)=>{
+                    if(err) throw err;
+                    console.log(status);
+                });
+
+           }
+
+           fetch();
+
+
+        });
+        
+
+    </script>
+
+</html>
