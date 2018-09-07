@@ -30,7 +30,11 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="#"><span id="balance">0</span> coin
+              <a class="nav-link" href="#">
+                <div>
+                    Deposit:&nbsp;<span id="deposit">0</span>&nbsp;ETH /
+                    Balance:&nbsp;<span id="balance">0</span>&nbsp;ETH
+                </div>
                 <span class="sr-only">(current)</span>
               </a>
             </li>
@@ -77,20 +81,25 @@
     <script src="static/js/uuid.js"></script>
     <script>
 
-      var abi = [{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"constant":false,"inputs":[{"name":"receiver","type":"address"},{"name":"amount","type":"uint256"}],"name":"sendCoin","outputs":[{"name":"sufficient","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"getBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"deviceWalletAddress","type":"address"}],"name":"addPurchase","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"deviceWalletAddress","type":"address"}],"name":"addDevice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"isBroadcastable","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"walletAddress","type":"address"}],"name":"verifyPurchase","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}];
-      var contractAddress = "0x345ca3e014aaf5dca488057592ee47305d9b3e10";
+      var abi = [{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"uuid","type":"string"}],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"getBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"deviceWalletAddress","type":"address"}],"name":"addDevice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"isBroadcastable","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"walletAddress","type":"address"}],"name":"verifyPurchase","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}];
+      var contractAddress = "0x0e523bf2344690f78373a38e875527a5dd4f12e7";
       var contract = web3.eth.contract(abi).at(contractAddress)
       var myAddress = web3.eth.defaultAccount;
-      contract.getBalance(myAddress, function(err, balance){
-        $('#balance').html(balance.c[0]);
+      web3.eth.getBalance(myAddress, function(err, balance){
+        $('#balance').html(balance.c[0]/10000);
       });
+      contract.methods.getBalance(function(err, balance){
+        $('#deposit').html(balance.c[0]/10000);
+      });
+      
       
       //  購入スクリプト
       function buy(to){
         var from = web3.eth.defaultAccount;
         var u4 = uuid4();
         console.log(u4);
-        contract.sendCoin(to, 10, function(err, result){
+        contract.deposit(to, u4, {value: 100}, function(err, result){
+          console.log(result);
         });
         
         //contract.functions.addPurchase().transact();

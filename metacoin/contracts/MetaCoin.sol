@@ -7,24 +7,32 @@ pragma solidity ^0.4.18;
 
 contract MetaCoin {
 	
-	mapping (address => uint) balances;
-	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
-	function sendCoin(address receiver, uint amount) public returns(bool sufficient){
-		if( balances[msg.sender] < amount ) return false;
-		balances[msg.sender] -= amount;
-		balances[receiver] += amount;
-		Transfer(msg.sender, receiver, amount);
-		return true;
+	/*
+		sharesに値が入っていれば引き出せる。
+		お金はコントラクト上にshareとして持っておき、それをやりとりする
+	*/
+    /// Mapping of ether shares of the contract.
+    mapping(address => uint) shares;
+    /// Withdraw your share.
+    function withdraw() public {
+        uint share = shares[msg.sender];
+        shares[msg.sender] = 0;
+        msg.sender.transfer(share);
+    }
+	function deposit(address to, string uuid) public payable{
+		shares[to] += msg.value;
+		purchases[uuid].deviceWalletAddress = to;
 	}
 
-	function getBalance(address addr) public view returns(uint){
-		return balances[addr];
-	}
-
-
-	//	コントラクトを作成したアカウントのアドレス
-	address owner;
+    function getBalance() public view returns(uint){
+        return shares[msg.sender];
+    }
+    
+    function MetaCoin() public{
+        
+    }
+  
 
 	/*
 		動画を許可しているかどうか
@@ -41,7 +49,6 @@ contract MetaCoin {
 	}
 
 
-
 	/*
 		購入履歴データ
 		購入UUIDを紐づける
@@ -49,29 +56,8 @@ contract MetaCoin {
 	mapping (string => Purchase) purchases;
 
 
-	/*
-		コンストラクタ
-	*/
-	function MetaCoin() public {
-		owner = msg.sender;
-		balances[tx.origin] = 10000;
-	}
 
-	/*
-		コントラクトの作成者のみが使用できることを意味する修飾子
-	*/
-	modifier onlyOwner{
-		require(msg.sender == owner);
-		_;
-	}
 
-	/*
-		購入履歴を追加
-	*/
-	function addPurchase(string purchaseUuid, address deviceWalletAddress) public {
-		purchases[purchaseUuid].deviceWalletAddress = deviceWalletAddress;
-		
-	}
 
 	/*
 		配信デバイスを追加
