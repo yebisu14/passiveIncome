@@ -30,18 +30,9 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-              <a class="nav-link" href="#">Home
+              <a class="nav-link" href="#"><span id="balance">0</span> coin
                 <span class="sr-only">(current)</span>
               </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Services</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Contact</a>
             </li>
           </ul>
         </div>
@@ -57,10 +48,12 @@
 
         {% for row in args %}
         <div class="col-lg-3 col-md-4 col-xs-6">
-          <a href="" class="d-block mb-4 h-100">
+          <a class="d-block mb-4 h-100" href="javascript:void(0);" onclick="buy('{{ row.wallet_address }}');">
             <img class="img-fluid img-thumbnail" src="static/img/thumbnails/{{ row.uri_thumbnail }}" alt="" width="300px" height="400px">
+            <!--
             <img class="img-fluid" src="static/img/qrcodes/{{ row.uri_qrcode }}" alt="{{ row.wallet_address }}">
             <p>{{ row.wallet_address }}</p>
+            -->
           </a>
         </div>
         {% endfor %}
@@ -81,6 +74,29 @@
     <!-- Bootstrap core JavaScript -->
     <script src="static/vendor/jquery/jquery.min.js"></script>
     <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/uuid.js"></script>
+    <script>
+
+      var abi = [{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"constant":false,"inputs":[{"name":"receiver","type":"address"},{"name":"amount","type":"uint256"}],"name":"sendCoin","outputs":[{"name":"sufficient","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"getBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"deviceWalletAddress","type":"address"}],"name":"addPurchase","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"deviceWalletAddress","type":"address"}],"name":"addDevice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"isBroadcastable","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"walletAddress","type":"address"}],"name":"verifyPurchase","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}];
+      var contractAddress = "0x345ca3e014aaf5dca488057592ee47305d9b3e10";
+      var contract = web3.eth.contract(abi).at(contractAddress)
+      var myAddress = web3.eth.defaultAccount;
+      contract.getBalance(myAddress, function(err, balance){
+        $('#balance').html(balance.c[0]);
+      });
+      
+      //  購入スクリプト
+      function buy(to){
+        var from = web3.eth.defaultAccount;
+        var u4 = uuid4();
+        console.log(u4);
+        contract.sendCoin(to, 10, function(err, result){
+        });
+        
+        //contract.functions.addPurchase().transact();
+        
+      }
+    </script>
 
   </body>
 

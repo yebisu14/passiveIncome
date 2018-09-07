@@ -1,7 +1,5 @@
 pragma solidity ^0.4.18;
 
-import "./ConvertLib.sol";
-
 // This is just a simple example of a coin-like contract.
 // It is not standards compatible and cannot be expected to talk to other
 // coin/token contracts. If you want to create a standards-compliant
@@ -56,7 +54,7 @@ contract MetaCoin {
 	*/
 	function MetaCoin() public {
 		owner = msg.sender;
-		
+		balances[tx.origin] = 10000;
 	}
 
 	/*
@@ -72,6 +70,7 @@ contract MetaCoin {
 	*/
 	function addPurchase(string purchaseUuid, address deviceWalletAddress) public {
 		purchases[purchaseUuid].deviceWalletAddress = deviceWalletAddress;
+		
 	}
 
 	/*

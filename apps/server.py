@@ -7,12 +7,15 @@ import json
 import urllib.request
 
 DB_NAME = "./data.db"
+INFURA = "https://ropsten.infura.io/v3/35d7622ec4464668b44f8313abfc09a9"
+CONTRACT_ADDRESS = " 0x2b44866d7e0473d709fc68552c71b45d34004025"
+
 
 def initContract():
     # コントラクト初期化
-    web3 = Web3(HTTPProvider('http://localhost:9545'))
+    web3 = Web3(HTTPProvider(INFURA))
     web3.eth.defaultAccount = web3.eth.accounts[0]
-    contractAddress = Web3.toChecksumAddress("0x057d2360abbe75f9fdf142f2cfe68cfc9a74ec12")
+    contractAddress = Web3.toChecksumAddress(CONTRACT_ADDRESS)
     abi = '[{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"deviceWalletAddress","type":"address"}],"name":"addPurchase","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"deviceWalletAddress","type":"address"}],"name":"addDevice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"isBroadcastable","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"walletAddress","type":"address"}],"name":"verifyPurchase","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}]'
 
     abiJson = json.loads(abi)
