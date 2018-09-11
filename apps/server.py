@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, make_response
 import sqlite3
 from web3 import Web3, HTTPProvider
 import json
 import urllib.request
+from datetime import datetime
 
 DB_NAME = "./data.db"
 INFURA = "https://ropsten.infura.io/v3/35d7622ec4464668b44f8313abfc09a9"
-CONTRACT_ADDRESS = "0x0e523bf2344690f78373a38e875527a5dd4f12e7"
+CONTRACT_ADDRESS = "0xd329d886f1131c43bb62966755761ecaa16e9318"
 
 
 def initContract():
@@ -74,19 +75,47 @@ def request_watching():
 """
 @app.route('/broadcast')
 def request_broadcast():
-    uri = request.args.get('uri')
+    imgUri = request.args.get('img_uri')
+    broadcastUri = request.args.get('broadcast_uri')
     wallet_address = request.args.get('addr')
     # アドレスからQRコードを作成
     saveQrCode(wallet_address)
     # DMMのサーバ上にあるDBにブロードキャストURIを登録
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO broadcast_uris VALUES(?,?)', [wallet_address, uri])
+    cursor.execute('INSERT INTO broadcast_uris VALUES(?,?)', [wallet_address, broadcastUri])
     # DMMのサーバ上にあるDBにサムネイルを登録
-    cursor.execute('INSERT INTO thumbnails VALUES(?,?)', [wallet_address, 'landmark_tower_tokyo.png'])
+    cursor.execute('INSERT INTO thumbnails VALUES(?,?)', [wallet_address, imgUri])
     conn.commit()
     conn.close()
     return "OK."
+
+"""
+サムネイルのアップロード
+成功した場合はファイル名が帰る
+失敗した場合はステータスが帰る
+"""
+@app.route('/upload', methods=['POST'])
+def upload_image():
+    # ファイルがあるかどうかのチェック
+    if 'img' not in request.files:
+        return make_response(jsonify({
+            'result':'uploadFile is required.',
+            'status': 'NG'
+        }))
+    
+    # サムネイルサイズが正しいかどうかのチェック
+    
+    # ファイルが存在するときはファイル名を一時ファイル名にして保存
+    file = request.files['img']
+    fileName = datetime.now().strftime("%Y%m%d_%H%M%S") + ".jpg"
+    file.save('./static/img/thumbnails/'+fileName)
+
+    # ファイル名をレスポンスとして返す
+    return make_response(jsonify({
+        'status': 'OK',
+        'filename': fileName
+    }))
 
 
 
@@ -110,6 +139,20 @@ def index():
         )
     conn.close()
     return render_template('index.html', args = args)
+
+
+"""
+データ消す
+"""
+@app.route('/del')
+def delete():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM thumbnails')
+    cursor.execute('DELETE FROM broadcast_uris')
+    conn.commit()
+    conn.close()
+    return 'OK'
 
 
 """
