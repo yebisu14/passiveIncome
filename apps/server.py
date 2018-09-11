@@ -8,13 +8,13 @@ import urllib.request
 
 DB_NAME = "./data.db"
 INFURA = "https://ropsten.infura.io/v3/35d7622ec4464668b44f8313abfc09a9"
-CONTRACT_ADDRESS = " 0x2b44866d7e0473d709fc68552c71b45d34004025"
+CONTRACT_ADDRESS = "0x0e523bf2344690f78373a38e875527a5dd4f12e7"
 
 
 def initContract():
     # コントラクト初期化
     web3 = Web3(HTTPProvider(INFURA))
-    web3.eth.defaultAccount = web3.eth.accounts[0]
+    #web3.eth.defaultAccount = web3.eth.accounts[0]
     contractAddress = Web3.toChecksumAddress(CONTRACT_ADDRESS)
     abi = '[{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"deviceWalletAddress","type":"address"}],"name":"addPurchase","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"deviceWalletAddress","type":"address"}],"name":"addDevice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"isBroadcastable","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"walletAddress","type":"address"}],"name":"verifyPurchase","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}]'
 
@@ -53,7 +53,7 @@ app = Flask(__name__)
 @app.route('/watch')
 def request_watching():
     contract = initContract()
-    uuid_purchase = request.args.get('pid')
+    uuid_purchase = request.args.get('uuid')
     wallet_address = request.args.get('addr')
     # ブロードキャストが有効かチェック
     if not contract.functions.isBroadcastable(wallet_address).call():
@@ -112,6 +112,12 @@ def index():
     return render_template('index.html', args = args)
 
 
+"""
+購入一覧
+"""
+@app.route('/histories')
+def histories():
+    return render_template('histories.html')
 
 
 

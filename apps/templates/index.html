@@ -29,6 +29,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/histories">
+                  購入履歴
+                </a>
+            </li>
             <li class="nav-item active">
               <a class="nav-link" href="#">
                 <div>
@@ -52,13 +57,14 @@
 
         {% for row in args %}
         <div class="col-lg-3 col-md-4 col-xs-6">
-          <a class="d-block mb-4 h-100" href="javascript:void(0);" onclick="buy('{{ row.wallet_address }}');">
+          <div class="d-block mb-4 h-100" href="javascript:void(0);" onclick="buy('{{ row.wallet_address }}');">
             <img class="img-fluid img-thumbnail" src="static/img/thumbnails/{{ row.uri_thumbnail }}" alt="" width="300px" height="400px">
+            0.1ETH
             <!--
             <img class="img-fluid" src="static/img/qrcodes/{{ row.uri_qrcode }}" alt="{{ row.wallet_address }}">
             <p>{{ row.wallet_address }}</p>
             -->
-          </a>
+          </div>
         </div>
         {% endfor %}
 
@@ -94,12 +100,20 @@
       
       
       //  購入スクリプト
+      //  pythonでラップしてクライアント側には何もさせない方がいいのではないか
       function buy(to){
         var from = web3.eth.defaultAccount;
         var u4 = uuid4();
         console.log(u4);
-        contract.deposit(to, u4, {value: 100}, function(err, result){
+        contract.deposit(to, u4, {value: web3.toWei(0.1, "ether")}, function(err, result){
           console.log(result);
+          var reciepts = JSON.parse(localStorage.getItem("reciepts")) || [];
+          reciepts.push({
+            uuid: u4,
+            addr: to
+          });
+          localStorage.setItem("reciepts", JSON.stringify(reciepts));
+          //localStorage.setItem("uuids", u4);
         });
         
         //contract.functions.addPurchase().transact();

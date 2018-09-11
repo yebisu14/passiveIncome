@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Thumbnail Gallery - Start Bootstrap Template</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+    <div class="container">
+      
+      <h1>購入履歴</h1>
+      <table id="table">
+        
+      </table>
+
+
+    </div>
+
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      $(()=>{
+        var reciepts = JSON.parse(localStorage.getItem("reciepts")) || [];
+        reciepts.forEach(elem => {
+          var uuid = elem.uuid;
+          var addr = elem.addr;
+          // /watch?pid=XXXX&addr=XXXX
+          $('table').append(`<tr><td><a href="/watch?uuid=${uuid}&addr=${addr}">動画</a></td></tr>`);
+        });
+      });
+
+    
+    </script>
+  </body>
+</html>

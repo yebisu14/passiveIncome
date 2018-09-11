@@ -25,7 +25,7 @@ contract MetaCoin {
 		purchases[uuid].deviceWalletAddress = to;
 	}
 
-    function getBalance() public view returns(uint){
+    function getDepositedBalance() public view returns(uint){
         return shares[msg.sender];
     }
     
