@@ -64,7 +64,7 @@ def sendBroadcastRequest(contract, walletAddress, imgUri, broadcastUri):
     })
     signed = web3.eth.account.signTransaction(transaction, PRIVATE_KEY)
     result = web3.eth.sendRawTransaction(signed.rawTransaction)
-    print("transaction result", Web3.toChecksumAddress(Web3.toHex(result)))
+    print("transaction result", Web3.toHex(result))
 
     # DMMに登録する、URLもいるのかな？
     url = 'http://0.0.0.0:5000/broadcast'
