@@ -142,6 +142,29 @@ def index():
 
 
 """
+マイページを表示する
+"""
+@app.route('/mypage')
+def mypage():
+    return render_template('mypage.html')
+
+
+"""
+動画情報(metatag)をJSONリクエストで返す
+"""
+@app.route('/meta', methods=["POST"])
+def meta():
+    # json形式で動画と紐づいたウォレットアドレスを取得
+    if request.headers['Content-Type'] != 'application/json':
+        print(request.headers['Content-Type'])
+        return jsonify(res='error'), 400
+
+    # json形式で取得したウォレットアドレス
+    data = json.loads(request.json)
+    pass
+
+
+"""
 データ消す
 """
 @app.route('/del')

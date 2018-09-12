@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>MyPage</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="static/css/thumbnail-gallery.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <div class="container">
+      <h1>MyPage</h1><br>
+
+      <form>
+        <div class="form-group">
+          <label for="address">口座アドレス</label>
+          <input type="text" class="form-control" id="address" aria-describedby="emailHelp" placeholder="Your wallet address" disabled>
+          <small id="emailHelp" class="form-text text-muted">ここで指定したアドレスに動画配信報酬が振り込まれます。</small>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">配信アドレス</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="URL">
+          <small id="emailHelp" class="form-text text-muted">配信が閲覧可能なURLを指定してください。</small>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">配信中の動画名</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="東京タワー">
+          <small id="emailHelp" class="form-text text-muted">配信中の動画の名前を設定してください。</small>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">配信中の動画説明</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="東京タワーを常時撮影している動画です。">
+          <small id="emailHelp" class="form-text text-muted">配信中の動画を説明してください。</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Apply</button>
+      </form>
+
+      <hr>
+
+      <form>
+        <div class="form-group">
+          <p>サービス預かり残高</p>
+          <p><span id="deposit">---</span> ETH</p>
+        <button type="submit" class="btn btn-primary">Withdraw</button>
+      </form>
+
+    </div>
+
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+      /* コントラクトの設定 */
+      
+
+      /* withdrawコントラクトの発行 */
+
+
+      $(()=>{
+        var myAddress = web3.eth.defaultAccount;
+        $('#address').val(myAddress);
+
+        /* 預け金を取得する */
+        contract.getDepositedBalance(myAddress, function(err, balance){
+          var n = web3.fromWei(balance, "ether");
+          $('#deposit').text(n);
+        });
+
+        /* アドレスから配信アドレス等のデータを取得する */
+      });
+
+
+    </script>
+
+  </body>
+</html>

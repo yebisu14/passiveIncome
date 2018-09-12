@@ -11,7 +11,6 @@
 はじめにconfig.iniで設定を行ってください。
 
 ```
-private_key=[ウォレットの秘密鍵]
 account_address=[ウォレットのアドレス]
 broadcast_uri=[ブロードキャストを有効にしているURL]
 ```

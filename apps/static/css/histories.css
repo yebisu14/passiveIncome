@@ -1,0 +1,25 @@
+.movie-row{
+    border: #000000 solid 1px;
+    overflow: hidden;
+    /*padding: 8px;*/
+}
+
+.flexbox{
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-thumbnail{
+    float: left;
+    background: gray; 
+    width: 200px;
+    height: 200px;
+}
+
+.movie-title{
+
+}
+
+.movie-description{
+
+}
