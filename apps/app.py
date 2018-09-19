@@ -4,7 +4,7 @@
 最小限のFlask鯖
 """
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -34,7 +34,8 @@ HLSストリーミングを表示する
 """
 @app.route('/watch')
 def watch():
-    return render_template('watch.html', movie_uri="test.mp4")
+    key = request.args.get("key", type=str)
+    return render_template('watch.html', key=key)
 
 
 
