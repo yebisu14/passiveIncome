@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 
-"""
-最小限のFlask鯖
-"""
-
 from flask import Flask, render_template, request
+from sqlite3
+
+
+"""
+定数
+"""
+DB_NAME = "./data.db"
+
+
+
 
 app = Flask(__name__)
 
@@ -23,9 +29,26 @@ jinja_options.update({
 app.jinja_options = jinja_options    
 
 
+"""
+今オープンになっている動画一覧を返す
+データベースからサムネイルをひっぱてきて一覧にする
+"""
 @app.route('/')
-def hello():
-    return 'Hello, World!'
+def index():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    args = []
+    for row in cursor.execute('SELECT * FROM thumbnail_uris'):
+        args.append(
+            {
+                'wallet_address': row[0],
+                'uri_thumbnail': row[1],
+                'uri_qrcode': '{}.png'.format(row[0])
+            }
+        )
+    conn.close()
+    return render_template('index.html', args = args)
+
 
 
 """
