@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, render_template, request
-from sqlite3
+import sqlite3
 
 
 """
@@ -43,7 +43,7 @@ def index():
             {
                 'wallet_address': row[0],
                 'uri_thumbnail': row[1],
-                'uri_qrcode': '{}.png'.format(row[0])
+                #'uri_qrcode': '{}.png'.format(row[0])
             }
         )
     conn.close()
