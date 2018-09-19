@@ -11,7 +11,7 @@
       if(Hls.isSupported()) {
         var video = document.getElementById('video');
         var hls = new Hls();
-        hls.loadSource('/hls/test2.m3u8');
+        hls.loadSource('/hls/<< key >>.m3u8');
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED,function() {
           video.play();
