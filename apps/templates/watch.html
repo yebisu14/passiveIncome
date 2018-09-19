@@ -5,13 +5,19 @@
   <script src="http://vjs.zencdn.net/4.2.0/video.js"></script>
 </head>
 <body>
-  <video id="rtmp live test" class="video-js vjs-default-skin" controls
-   preload="auto" width="640" height="264" data-setup='{}'>
-    <source src="rtmp://ec2-13-231-137-35.ap-northeast-1.compute.amazonaws.com/live/<< key >>" type='rtmp/mp4'>
-    <p class="vjs-no-js">
-      To view this video please enable JavaScript, and consider upgrading to a web browser
-      that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
-    </p>
-  </video>
+    <script src="https://cdn.jsdelivr.net/hls.js/latest/hls.min.js"></script>
+    <video id="video"></video>
+    <script>
+      if(Hls.isSupported()) {
+        var video = document.getElementById('video');
+        var hls = new Hls();
+        hls.loadSource('/hls/test2.m3u8');
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+          video.play();
+      });
+     }
+    </script>
+
 </body>
 </html>
