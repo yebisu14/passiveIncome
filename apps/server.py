@@ -6,23 +6,24 @@ from web3 import Web3, HTTPProvider
 import json
 import urllib.request
 from datetime import datetime
+import configparser
+import werkzeug
 
 DB_NAME = "./data.db"
-INFURA = "https://ropsten.infura.io/v3/35d7622ec4464668b44f8313abfc09a9"
-CONTRACT_ADDRESS = "0xd329d886f1131c43bb62966755761ecaa16e9318"
 
+config = configparser.ConfigParser()
+config.read('./config.ini')
 
-def initContract():
-    # コントラクト初期化
-    web3 = Web3(HTTPProvider(INFURA))
-    #web3.eth.defaultAccount = web3.eth.accounts[0]
-    contractAddress = Web3.toChecksumAddress(CONTRACT_ADDRESS)
-    abi = '[{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"deviceWalletAddress","type":"address"}],"name":"addPurchase","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"deviceWalletAddress","type":"address"}],"name":"addDevice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"isBroadcastable","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"walletAddress","type":"address"}],"name":"verifyPurchase","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}]'
+# 定数の設定
+contractAddress = config.get('contract', 'contract_address')
+abi = config.get('contract', 'abi')
+abiJson = json.loads(abi)
+infra = config.get('eth', 'infra')
 
-    abiJson = json.loads(abi)
-    contract = web3.eth.contract(abi = abiJson, address = contractAddress)
-    print("Contract was regulated.")
-    return contract
+# コントラクト初期化
+web3 = Web3(HTTPProvider(infra))
+addr = Web3.toChecksumAddress(contractAddress)
+contract = web3.eth.contract(abi = abiJson, address = addr)
 
 
 def saveQrCode(walleAddress):
@@ -38,7 +39,16 @@ def saveQrCode(walleAddress):
 
 
 app = Flask(__name__)
-
+jinja_options = app.jinja_options.copy()                                         
+jinja_options.update({                                                      
+    'block_start_string': '<%',                                                 
+    'block_end_string': '%>',                                                   
+    'variable_start_string': '<<',                                              
+    'variable_end_string': '>>',                                                
+    'comment_start_string': '<#',                                               
+    'comment_end_string': '#>'                  
+})                                                                               
+app.jinja_options = jinja_options    
 
 
 
@@ -53,14 +63,14 @@ app = Flask(__name__)
 """
 @app.route('/watch')
 def request_watching():
-    contract = initContract()
     uuid_purchase = request.args.get('uuid')
     wallet_address = request.args.get('addr')
+    walletAddress = Web3.toChecksumAddress(wallet_address)
     # ブロードキャストが有効かチェック
-    if not contract.functions.isBroadcastable(wallet_address).call():
+    if not contract.functions.isBroadcastable(walletAddress).call():
         return "Bad device."
     # その動画の購入履歴があるかチェック
-    if not contract.functions.verifyPurchase(uuid_purchase, wallet_address).call():
+    if not contract.functions.verifyPurchase(uuid_purchase, walletAddress).call():
         return "No histories of purchase."
     # DMMのサーバ上にあるDBを見てURIを参照
     conn = sqlite3.connect(DB_NAME)
@@ -85,7 +95,7 @@ def request_broadcast():
     cursor = conn.cursor()
     cursor.execute('INSERT INTO broadcast_uris VALUES(?,?)', [wallet_address, broadcastUri])
     # DMMのサーバ上にあるDBにサムネイルを登録
-    cursor.execute('INSERT INTO thumbnails VALUES(?,?)', [wallet_address, imgUri])
+    cursor.execute('INSERT INTO thumbnail_uris VALUES(?,?)', [wallet_address, imgUri])
     conn.commit()
     conn.close()
     return "OK."
@@ -129,7 +139,7 @@ def index():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     args = []
-    for row in cursor.execute('SELECT * FROM thumbnails'):
+    for row in cursor.execute('SELECT * FROM thumbnail_uris'):
         args.append(
             {
                 'wallet_address': row[0],
@@ -146,22 +156,70 @@ def index():
 """
 @app.route('/mypage')
 def mypage():
-    return render_template('mypage.html')
+    data = {
+        'abi': abi,
+        'contract_address': contractAddress
+    }
+    return render_template('mypage.html', data=data)
 
 
 """
-動画情報(metatag)をJSONリクエストで返す
+動画のメタ情報を登録する
 """
-@app.route('/meta', methods=["POST"])
-def meta():
-    # json形式で動画と紐づいたウォレットアドレスを取得
-    if request.headers['Content-Type'] != 'application/json':
-        print(request.headers['Content-Type'])
-        return jsonify(res='error'), 400
+@app.route('/register_meta', methods=["POST"])
+def register_meta():
+    # フォームデータをチェック
+    print(request.form)
+    uri = request.form['uri']
+    name = request.form['name']
+    description = request.form['description']
+    addr = request.form['addr']
+    fileName = ""
 
-    # json形式で取得したウォレットアドレス
-    data = json.loads(request.json)
-    pass
+    # ファイルが存在するときはファイル名を一時ファイル名にして保存
+    if 'thumbnail' in request.files:
+        img = request.files['thumbnail']
+        fileName = datetime.now().strftime("%Y%m%d_%H%M%S_")
+        fileName += werkzeug.utils.secure_filename(img.filename)
+        img.save('./static/img/thumbnails/'+fileName)
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('REPLACE INTO broadcast_uris VALUES(?, ?)', [addr, uri])
+    cursor.execute('REPLACE INTO names VALUES(?, ?)', [addr, name])
+    cursor.execute('REPLACE INTO descriptions VALUES(?, ?)', [addr, description])
+    if fileName:
+        cursor.execute('REPLACE INTO thumbnail_uris VALUES(?, ?)', [addr, fileName])
+    conn.commit()
+    conn.close()
+    return 'OK'
+
+
+"""
+アドレスに紐づいた動画情報(metatag)をJSONリクエストで返す
+"""
+@app.route('/get_meta', methods=["GET"])
+def get_meta():
+    addr = request.args['addr']
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    args = {}
+    for row in cursor.execute("""
+        SELECT name, description, broadcast_uri, thumbnail_uri FROM names, descriptions, broadcast_uris 
+        LEFT JOIN thumbnail_uris ON names.wallet_address = thumbnail_uris.wallet_address
+        WHERE names.wallet_address = ? and names.wallet_address = descriptions.wallet_address and 
+        names.wallet_address = broadcast_uris.wallet_address 
+        """, [addr]):
+        args['wallet_address'] = addr
+        args['name'] = row[0]
+        args['description'] = row[1]
+        args['uri'] = row[2]
+        args['thumbnail'] = row[3]
+
+    conn.close()
+    return jsonify(args)
+    
+
 
 
 """

@@ -2,6 +2,7 @@
     border: #000000 solid 1px;
     overflow: hidden;
     /*padding: 8px;*/
+    margin-top: 8px;
 }
 
 .flexbox{

@@ -1,0 +1,64 @@
+@startuml withdraw_sequence
+
+title Withdraw Sequence (Revised).
+hide footbox
+
+Actor Broadcaster as user
+Actor Buyer as user2
+
+participant Device as device
+participant "Browser(MetaMask)" as browser
+participant Contract as contract
+
+
+== Purchase ==
+
+note over browser
+Browser has MetaMask extention.
+
+endnote
+
+user2 -> browser: onClickBuyButton()
+activate browser
+
+    note over browser, contract
+    Execute deposit function with buyer's private key on browser.
+    Deposit coins to broadcaster's temporally wallet on contract.
+    endnote
+
+    browser -> contract: deposit(reciever: address)
+    activate contract
+    contract --> browser: success
+    deactivate contract
+
+deactivate browser
+
+
+
+== Withdrawing ==
+
+user -> browser: onClickWithdrawButton()
+activate browser
+
+note over browser, contract
+Execute withdraw function with broadcaster's private key on browser.
+Withdraw coins from my temporally wallet on contract.
+endnote
+
+browser -> contract: withdraw(myAddress: address)
+activate contract
+
+contract --> browser: success
+deactivate contract
+
+
+
+deactivate browser
+
+
+
+
+
+
+
+@enduml

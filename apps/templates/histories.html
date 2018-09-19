@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Thumbnail Gallery - Start Bootstrap Template</title>
+    <title>購入履歴</title>
 
     <!-- Bootstrap core CSS -->
     <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -19,43 +19,60 @@
   </head>
 
   <body>
-    <div class="container">
+    <div class="container" id="app">
       
       <h1>購入履歴</h1>
 
-      <div class="movie-row">
+      <div class="movie-row" v-on:click="watch(index)" v-for="(metadata, index) in metadatas">
         <div class="movie-thumbnail">
+          <img :src="metadata.thumbnail">
         </div>
         <div class="flexbox">
-          <div class="movie-title">動画タイトル</div>
-          <div class="movie-description">動画説明</div>
-          <span class="movie-price">購入価格</span>
-          <span class="movie-expire">視聴期限</span>
+          <div class="movie-title">{{metadata.name}}</div>
+          <div class="movie-description">{{metadata.description}}</div>
+          <span class="movie-price">0.1 ETH</span>
+          <span class="movie-expire">2999/12/31 まで視聴可能</span>
         </div>
       </div>
-
-      <table id="table">
-        
-      </table>
-
 
     </div>
 
     <script src="static/vendor/jquery/jquery.min.js"></script>
     <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-      $(()=>{
-        var reciepts = JSON.parse(localStorage.getItem("reciepts")) || [];
-        reciepts.forEach(elem => {
-          var uuid = elem.uuid;
-          var addr = elem.addr;
-          // /watch?pid=XXXX&addr=XXXX
-          $('table').append(`<tr><td><a href="/watch?uuid=${uuid}&addr=${addr}">動画</a></td></tr>`);
-        });
+      var app2 = new Vue({
+        el: '#app',
+        data: {
+          metadatas: [],
+          message: "test"
+        },
+        methods: {
+          watch: function(index){
+            var uuid = this.metadatas[index].uuid;
+            var addr = this.metadatas[index].addr;
+            location.href = "/watch?uuid="+uuid+"&addr="+addr;
+          }
+        },
+        mounted(){
+          var reciepts = JSON.parse(localStorage.getItem("reciepts")) || [];
+          reciepts.forEach((reciept)=>{
+            axios.get('/get_meta?addr='+reciept.addr)
+            .then(response=>{
+              this.metadatas.push({
+                uuid: reciept.uuid,
+                addr: reciept.addr,
+                name: response.data.name,
+                description: response.data.description,
+                thumbnail: 'static/img/thumbnails/'+response.data.thumbnail
+              });
+            });
+          });
+        }
       });
 
-    
     </script>
   </body>
 </html>
+

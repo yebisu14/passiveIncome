@@ -1,0 +1,24 @@
+@startuml watch
+
+title Sequence of watching (Stand Alone).
+hide footbox
+
+participant User as user
+participant Device as device
+participant Contract as contract
+
+user -> device: HttpRequest(URL, uuid)
+activate device
+
+device -> contract: result = verifyPurchase(uuid, address=msg.sender)
+activate contract
+contract --> device: valid
+deactivate contract
+
+
+device --> user: HttpResponse as HLS
+deactivate device
+
+
+
+@enduml

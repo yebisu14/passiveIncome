@@ -1,0 +1,33 @@
+@startuml activity_standalone
+title スタンドアローンモデル
+
+|User|
+start
+:動画をリクエストする;
+
+|Device|
+:購入情報をチェックする;
+
+|Contract|
+:購入情報をチェックする;
+
+|Device|
+if (購入情報がない) then (yes)
+    :購入画面を提供する;    
+    |User|
+    :購入する;  
+    |Contract|
+    :購入情報の保存;  
+else (no)
+endif
+
+|Device|
+:動画を提供する;
+
+|User|
+:動画を表示する;
+
+
+end
+
+@enduml

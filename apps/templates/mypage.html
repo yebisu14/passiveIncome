@@ -7,73 +7,115 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>MyPage</title>
+    <title>マイページ（デバイス登録ページ）</title>
 
     <!-- Bootstrap core CSS -->
     <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="static/css/thumbnail-gallery.css" rel="stylesheet">
+    <link href="static/css/mypage.css" rel="stylesheet">
+
 
   </head>
 
   <body>
 
     <div class="container">
-      <h1>MyPage</h1><br>
+      <h1>マイページ（デバイス登録ページ）</h1><br>
 
-      <form>
+      <form action="/register_meta" method="POST" enctype="multipart/form-data">
         <div class="form-group">
-          <label for="address">口座アドレス</label>
-          <input type="text" class="form-control" id="address" aria-describedby="emailHelp" placeholder="Your wallet address" disabled>
+          <label for="addr">口座アドレス</label>
+          <input type="text" class="form-control" id="addr" aria-describedby="emailHelp" placeholder="Your wallet address" disabled>
           <small id="emailHelp" class="form-text text-muted">ここで指定したアドレスに動画配信報酬が振り込まれます。</small>
+          <input type="hidden" id="hiddenAddr" name="addr">
         </div>
         <div class="form-group">
-          <label for="exampleInputEmail1">配信アドレス</label>
-          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="URL">
+          <label for="uri">配信アドレス</label>
+          <input type="text" class="form-control" name="uri" id="uri" aria-describedby="emailHelp" placeholder="URL" required>
           <small id="emailHelp" class="form-text text-muted">配信が閲覧可能なURLを指定してください。</small>
         </div>
         <div class="form-group">
-          <label for="exampleInputEmail1">配信中の動画名</label>
-          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="東京タワー">
+          <label for="name">配信中の動画名</label>
+          <input type="text" class="form-control" name="name" id="name" aria-describedby="emailHelp" placeholder="東京タワー" required>
           <small id="emailHelp" class="form-text text-muted">配信中の動画の名前を設定してください。</small>
         </div>
         <div class="form-group">
-          <label for="exampleInputEmail1">配信中の動画説明</label>
-          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="東京タワーを常時撮影している動画です。">
+          <label for="description">配信中の動画説明</label>
+          <input type="text" class="form-control" name="description" id="description" aria-describedby="emailHelp" placeholder="東京タワーを常時撮影している動画です。" required>
           <small id="emailHelp" class="form-text text-muted">配信中の動画を説明してください。</small>
+        </div>
+        <div class="form-group">
+            <label for="thumbnail">サムネイル</label>
+            <img src="" id="thumbnail" class="thumbnail">
+        </div>
+        <div class="form-group">
+          <input type="file" value="ファイルを選択" name="thumbnail">
         </div>
         <button type="submit" class="btn btn-primary">Apply</button>
       </form>
 
       <hr>
 
-      <form>
-        <div class="form-group">
+      <div>
           <p>サービス預かり残高</p>
           <p><span id="deposit">---</span> ETH</p>
-        <button type="submit" class="btn btn-primary">Withdraw</button>
-      </form>
+          <button id="withdraw" class="btn btn-primary">Withdraw</button>
+      </div>
+
+
 
     </div>
+
+    <!--
+    <input type="hidden" id="abi" value='{{ data.abi }}'/>
+    -->
+    <input type="hidden" id="contractAddress" value='<< data.contract_address >>' />
+
 
     <script src="static/vendor/jquery/jquery.min.js"></script>
     <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
-      /* コントラクトの設定 */
       
-
-      /* withdrawコントラクトの発行 */
-
-
       $(()=>{
+        /* コントラクト初期化 */
+        //var abi = $('#abi').val();
+        //var abiJson = JSON.parse(abi);
+        var abiJson = [{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"uuid","type":"string"}],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"getDepositedBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"deviceWalletAddress","type":"address"}],"name":"addDevice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"isBroadcastable","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"walletAddress","type":"address"}],"name":"verifyPurchase","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}]
+        //console.log(abiJson);
+        var contractAddress = $('#contractAddress').val();
+        var contract = web3.eth.contract(abiJson).at(contractAddress);
+
+        /* 自分のアドレスを取得 */
         var myAddress = web3.eth.defaultAccount;
-        $('#address').val(myAddress);
+        $('#addr').val(myAddress);
+        $('#hiddenAddr').val(myAddress);
 
         /* 預け金を取得する */
         contract.getDepositedBalance(myAddress, function(err, balance){
           var n = web3.fromWei(balance, "ether");
           $('#deposit').text(n);
+        });
+        
+        /* 配信中のメタデータを取得する */
+        $.get('/get_meta', {addr: myAddress}, (data)=>{
+          console.log(data);
+          $('#description').val(data.description);
+          $('#name').val(data.name);
+          $('#uri').val(data.uri);
+          $('#thumbnail').attr('src', '/static/img/thumbnails/'+data.thumbnail);
+        });
+
+        /* withdrawコントラクトの発行 */
+        $('#withdraw').on('click', ()=>{
+          contract.withdraw(function(err, result){
+            if(err){
+              console.log(err);
+              return;
+            }
+            location.reload();
+          });
         });
 
         /* アドレスから配信アドレス等のデータを取得する */

@@ -29,6 +29,8 @@ $ cat /path/to/Metacoin.json | jq -c .abi
 
 
 ### 動画配信デバイス
+nginxをrtmpモジュール付きでセットアップしてください。
+
 
 
 

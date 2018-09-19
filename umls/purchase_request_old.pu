@@ -1,0 +1,15 @@
+@startuml{purchase.png}
+
+title 購入シーケンス（初代）
+hide footbox
+
+participant ユーザ as user
+participant コントラクト as contract
+participant DMM as dmm
+
+user -> dmm: 公開鍵を渡す(pk)
+dmm -> user: uuid = 購入UUIDを発行する()
+dmm -> dmm: 登録(uuid, pk)
+user -> contract: UUIDを登録する(uuid)
+
+@enduml

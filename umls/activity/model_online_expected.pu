@@ -1,0 +1,50 @@
+@startuml activity_online
+title オンラインモデル（展望）
+
+|DMM|
+start
+:UIを提供する;
+note right
+動画選択および購入ができるUI
+endnote
+
+|User|
+:動画を選択する;
+:購入リクエストの作成;
+
+|Contract|
+:購入情報を書き込む;
+
+|User|
+:名前解決リクエストの作成;
+
+|DMM|
+:リクエスト処理;
+
+|Contract|
+:配信状態チェック;
+:購入情報チェック;
+
+|DMM|
+:名前解決を行う;
+
+if(配信方法) then(直接配信)
+    |Device|
+    :配信を行う;
+
+else(ホスティング)
+    |Device|
+    :AWSに送信する;
+
+    |AWS|
+    :配信を行う;
+
+endif
+
+|User|
+:動画を表示する;
+
+stop
+
+
+@enduml

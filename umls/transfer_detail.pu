@@ -1,0 +1,51 @@
+@startuml transfer_detail
+
+title Sequence of transfer.
+hide footbox
+
+Actor Broadcaster as user
+Actor Buyer as user2
+
+participant Browser as browser
+participant Contract as contract
+
+== deposit ==
+
+user2 -> browser: onClickBuyButton()
+activate browser
+
+    browser -> contract: deposit(reciever: address, value: int)
+    activate contract
+
+    note over contract
+    tmpWallet[reciever] += value
+    endnote
+
+
+    contract --> browser: success
+    deactivate contract
+
+deactivate browser
+
+
+== withdraw ==
+
+
+user -> browser: onClickWithdrawButton()
+activate browser
+
+    browser -> contract: withdraw(myAddress: address)
+    activate contract
+    
+    note over contract
+    value = tmpWallet[myAddress]
+    tmpWallet[myAddress] = 0
+    endnote
+    
+    contract --> browser: value
+    deactivate contract
+
+deactivate browser
+
+
+@enduml

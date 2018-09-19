@@ -59,18 +59,17 @@
 
       <div class="row text-center text-lg-left">
 
-        {% for row in args %}
+        <% for row in args %>
         <div class="col-lg-3 col-md-4 col-xs-6">
-          <div class="d-block mb-4 h-100" href="javascript:void(0);" onclick="buy('{{ row.wallet_address }}');">
-            <img class="img-fluid img-thumbnail" src="static/img/thumbnails/{{ row.uri_thumbnail }}" alt="" width="300px" height="400px">
-            0.1ETH
+          <div class="d-block mb-4 h-100" href="javascript:void(0);" onclick="buy('<< row.wallet_address >>');">
+            <img class="img-fluid img-thumbnail thumbnail" src="static/img/thumbnails/<< row.uri_thumbnail >>" alt="">
             <!--
             <img class="img-fluid" src="static/img/qrcodes/{{ row.uri_qrcode }}" alt="{{ row.wallet_address }}">
             <p>{{ row.wallet_address }}</p>
             -->
           </div>
         </div>
-        {% endfor %}
+        <% endfor %>
 
       </div>
 
@@ -80,7 +79,7 @@
     <!-- Footer -->
     <footer class="py-5 bg-dark">
       <div class="container">
-        <p class="m-0 text-center text-white">Copyright &copy; Your Website 2017</p>
+        <p class="m-0 text-center text-white">Copyright &copy; Passive Income 2018</p>
       </div>
       <!-- /.container -->
     </footer>

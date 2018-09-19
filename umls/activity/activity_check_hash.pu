@@ -1,0 +1,42 @@
+@startuml activity_check_hash
+title ブロックチェーン上のデータを利用した攻撃
+
+|Attacker|
+start
+:UUIDをコントラクトから不正取得する;
+
+|Contract|
+:UUID一覧を返す;
+note left
+実際にUUIDを取得するメソッドはないが、
+あると仮定する。
+endnote
+
+|Attacker|
+:不正に取得したuuid'でサーバに問い合わせる;
+
+|DMM|
+:コントラクト上にUUIDがあるか確認する;
+note left
+不正取得したUUIDで認証をパスできる
+endnote
+
+|Contract|
+if (uuid' is in uuids) then (yes)
+
+
+    |DMM|
+    :名前解決を行う;
+
+    |Attacker|
+    :配信しているURLを取得する;
+    
+else (no)
+    |Contract|
+    end    
+endif
+
+
+|Attacker|
+stop
+@enduml

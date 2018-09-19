@@ -1,0 +1,38 @@
+@startuml proving
+
+title Sequence of proving.
+hide footbox
+
+Actor buyer as user
+
+participant Brower as browser
+participant Contract as contract
+
+== Purchase ==
+
+user -> browser: onClickBuyButton()
+activate browser
+
+    note over browser
+    $movieAddress is automatically choosen.
+    endnote
+
+    browser -> browser: uuid = generateUuid()
+    activate browser
+    deactivate browser
+
+    browser -> contract: addPurchase(uuid, movieAddress)
+    activate contract
+        contract --> browser: success
+    deactivate contract
+
+deactivate browser
+
+
+
+
+
+
+
+
+@enduml

@@ -1,0 +1,47 @@
+@startuml activity_check_hash
+title ブロックチェーン上のデータを利用した攻撃
+
+|Attacker|
+start
+:UUIDをコントラクトから不正取得する;
+
+|Contract|
+:huuid一覧を返す;
+note left
+ハッシュ化されたUUIDが保存されている
+endnote
+
+|Attacker|
+:不正に取得したhuuid'でサーバに問い合わせる;
+
+|DMM|
+:受け取ったuuidをハッシュ化する;
+note right
+uuid'を想定しているので、huuid'が投げられると
+hhuuid'が生成される
+endnote
+
+:コントラクト上にhuuidがあるか確認する;
+
+note right
+huuidはhhuuid'と一致することはない
+endnote
+|Contract|
+if (huuid' is in huuids) then (yes)
+
+
+    |DMM|
+    :名前解決を行う;
+
+    |Attacker|
+    :配信しているURLを取得する;
+    
+else (no)
+    |Contract|
+    end    
+endif
+
+
+|Attacker|
+stop
+@enduml

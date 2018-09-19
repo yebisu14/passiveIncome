@@ -1,0 +1,19 @@
+@startuml privatekey.png
+
+title Sequence of purchase.
+
+hide footbox
+
+participant device as user
+participant contract
+
+user -> user: uuid = generateUuid()
+user -> user: saveUuid(uuid)
+
+user -> contract: purchase(uuid, reciever)
+
+user -> user: transaction = makeTransaction(sender, reciever)
+user -> user: eTransaction = encript(transaction, privateKey)
+user -> contract: transfer(eTransaction)
+
+@enduml

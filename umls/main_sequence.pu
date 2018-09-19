@@ -1,0 +1,86 @@
+@startuml main_sequence
+
+title Main Sequence.
+hide footbox
+
+participant User as user
+participant Contract as contract
+participant DMM as dmm
+participant Device as device
+participant AWS as aws
+
+== Purchase ==
+
+
+user -> user: uuid = generateUuid()
+activate user
+deactivate user
+
+user -> user: saveUuid(uuid)
+activate user
+deactivate user
+
+user -> user: movieAddress = selectMovieAddress()
+activate user
+deactivate user
+
+note over user
+huuid = Hash(uuid)
+endnote
+
+user -> contract: addPurchase(huuid, movieAddress)
+activate user
+    contract -> contract: issueReciept(huuid, movieAddress)
+    contract -> contract: transfer(from, to=movieAddress, value=0.1ETH)
+
+contract --> user: success
+deactivate user
+
+== Solving ==
+
+user -> dmm: requestURL(uuid, movieAddress)
+activate user
+activate dmm
+
+    dmm -> contract: result=isBroadcastable(movieAddress)
+    activate contract
+    contract --> dmm: valid
+    deactivate contract
+
+    dmm -> contract: result=checkReciept(huuid, movieAddress)
+    activate contract
+    contract --> dmm: valid
+    deactivate contract
+
+    dmm -> dmm: URL = resolve(movieAddress)
+deactivate dmm 
+
+dmm --> user: URL
+deactivate user
+
+== Watching ==
+
+alt broadcastMode == DIRECT
+
+user -> device: HttpRequest(URL)
+activate user
+activate device
+device --> user: HttpResponse as HLS
+deactivate device
+deactivate user
+
+else otherwise
+
+user -> aws: HttpRequest(URL)
+activate user
+activate aws
+
+device -> aws: push(hlsData)
+
+aws --> user: HttpResponse as HLS
+deactivate aws
+deactivate user
+
+end
+
+@enduml

@@ -1,0 +1,22 @@
+@startuml pk.png
+
+hide footbox
+
+participant 配信デバイス as device
+participant ユーザの端末 as user
+participant コントラクト as contract
+participant DMM as dmm
+
+user -> dmm: 名前解決要求(uuid)
+dmm -> contract: result=購入UUIDの検証(uuid)
+contract -> dmm: valid / invalid
+
+dmm -> dmm: eURL = encrypt(URL, ユーザの公開鍵)
+dmm -> user: eURL
+user -> user: URL=decrypt(eURL, ユーザの秘密鍵)
+
+user -> server: HTTPrequest(URL)
+
+
+
+@enduml

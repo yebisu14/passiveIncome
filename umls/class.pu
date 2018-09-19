@@ -1,0 +1,34 @@
+@startuml class
+
+class Reciept{
+    - uuid: string
+    - movieAddress: address
+}
+
+class Contract{
+    + addPurchase(uuid: string, movieAddress: address): bool
+    - issueReciept(uuid, movieAddress): bool
+    - transfer(from, to, value): bool
+}
+
+class MetaData{
+    - movieAddress: address
+    - broadcastAddress: URI
+    - title: string
+    - description: string
+    - price: int = 0.1ETH
+}
+
+class DMM{
+
+}
+
+class User{
+    
+}
+
+Contract "1" -> "*" Reciept
+
+DMM "1" -> "*" MetaData
+
+@enduml

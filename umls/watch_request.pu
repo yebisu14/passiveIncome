@@ -1,0 +1,42 @@
+@startuml watch
+
+title Sequence of watching.
+hide footbox
+
+participant User as user
+participant Contract as contract
+participant DMM as dmm
+participant Device as device
+
+== resolving ==
+
+user -> dmm: requestURL(uuid, movieAddress)
+activate user
+activate dmm
+
+    dmm -> contract: result=isBroadcastable(movieAddress)
+    activate contract
+    contract --> dmm: valid
+    deactivate contract
+
+    dmm -> contract: result=verifyPurchase(uuid, movieAddress)
+    activate contract
+    contract --> dmm: valid
+    deactivate contract
+
+    dmm -> dmm: URL = resolve(movieAddress, URL)
+deactivate dmm
+
+dmm --> user: URL
+deactivate user
+
+== watching ==
+
+user -> device: HttpRequest(URL)
+activate device
+device --> user: HttpResponse as HLS
+deactivate device
+
+
+
+@enduml
