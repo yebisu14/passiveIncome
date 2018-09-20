@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="jp">
 
   <head>
 
@@ -15,6 +15,8 @@
 
     <!-- Custom styles for this template -->
     <link href="static/css/thumbnail-gallery.css" rel="stylesheet">
+
+    <link href="static/css/common.css" rel="stylesheet">
 
   </head>
 
@@ -53,28 +55,30 @@
     </nav>
 
     <!-- Page Content -->
-    <div class="container">
-
-      <h1 class="my-4 text-center text-lg-left">Thumbnail Gallery</h1>
-      << playlists[0] >>
+    <div class="container" style="margin-top: 24px; margin-bottom: 24px;">
 
 
-      <div class="row text-center text-lg-left">
+        <div class="row">
 
-        <% for row in playlists %>
-        <div class="col-lg-3 col-md-4 col-xs-6">
-          <div class="d-block mb-4 h-100" href="javascript:void(0);" onclick="buy('<< row.wallet_address >>');">
-            <p><< row >></p>
-            <img class="img-fluid img-thumbnail thumbnail" src="static/img/thumbnails/<< row.uri_thumbnail >>" alt="">
-            <!--
-            <img class="img-fluid" src="static/img/qrcodes/{{ row.uri_qrcode }}" alt="{{ row.wallet_address }}">
-            <p>{{ row.wallet_address }}</p>
-            -->
+          <!-- 東京タワーを見る動画 -->
+          <div class="col-lg-3 col-md-4 col-xs-6 wrapper-thumbnail wrapper-a">
+            <span class="label-live">LIVE</span>
+            <img class="thumbnail" src="static/img/thumbnails/20180911_155441.jpg" alt="">
+            <p class="label-title">東京タワーを見る動画</p>
+            <a href="/watch?key=test"></a>
           </div>
-        </div>
-        <% endfor %>
 
-      </div>
+
+          <!-- 猫を見る動画 -->
+          <div class="col-lg-3 col-md-4 col-xs-6 wrapper-thumbnail">
+            <span class="label-live">LIVE</span>
+            <img class="thumbnail" src="static/img/thumbnails/20180911_155441.jpg" alt="">
+            <p class="label-title">猫を見る動画</p>
+          </div>
+  
+
+        </div>
+
 
     </div>
     <!-- /.container -->
@@ -92,39 +96,12 @@
     <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="static/js/uuid.js"></script>
     <script>
-
-      var abi = [{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"uuid","type":"string"}],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"getBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"deviceWalletAddress","type":"address"}],"name":"addDevice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"isBroadcastable","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"walletAddress","type":"address"}],"name":"verifyPurchase","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}];
-      var contractAddress = "0xd329d886f1131c43bb62966755761ecaa16e9318";
-      var contract = web3.eth.contract(abi).at(contractAddress)
-      var myAddress = web3.eth.defaultAccount;
-      web3.eth.getBalance(myAddress, function(err, balance){
-        $('#balance').html(balance.c[0]/10000);
+      $(()=>{
+        var myAddress = web3.eth.defaultAccount;
+        web3.eth.getBalance(myAddress, function(err, balance){
+          $('#balance').html(balance.c[0]/10000);
+        });    
       });
-      
-      //  購入スクリプト
-      //  pythonでラップしてクライアント側には何もさせない方がいいのではないか
-      function buy(to){
-        var from = web3.eth.defaultAccount;
-        var u4 = uuid4();
-        console.log(u4);
-        contract.deposit(to, u4, {value: web3.toWei(0.1, "ether")}, function(err, result){
-          if(err){
-            console.log(err);
-            return;
-          }
-          console.log(result);
-          var reciepts = JSON.parse(localStorage.getItem("reciepts")) || [];
-          reciepts.push({
-            uuid: u4,
-            addr: to
-          });
-          localStorage.setItem("reciepts", JSON.stringify(reciepts));
-          //localStorage.setItem("uuids", u4);
-        });
-        
-        //contract.functions.addPurchase().transact();
-        
-      }
     </script>
 
   </body>

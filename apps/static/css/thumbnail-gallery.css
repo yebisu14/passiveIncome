@@ -14,8 +14,34 @@ body {
   }
 }
 
+.wrapper-thumbnail{
+  position: relative;
+  min-width: 400px !important;
+  min-height: 320px !important;
+  padding: 10px;
+}
 
 .thumbnail{
-  width: 300px;
-  height: 300px;
+  width: 380px;
+  height: 280px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
+
+.label-live{
+  color: white;
+  background: red;
+  font-size: 44px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 999;
+}
+
+.label-title{
+  position: absolute;
+  top: 300px;
+  left: 0px;
+}
+
