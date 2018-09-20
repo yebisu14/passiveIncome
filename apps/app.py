@@ -3,7 +3,7 @@
 from flask import Flask, render_template, request
 import sqlite3
 from pathlib import Path
-from web3 import Web3, HTTPProvider
+#from web3 import Web3, HTTPProvider
 import configparser
 import json
 
