@@ -3,7 +3,7 @@
 from flask import Flask, render_template, request
 import sqlite3
 from pathlib import Path
-#from web3 import Web3, HTTPProvider
+from web3 import Web3, HTTPProvider
 import configparser
 import json
 
@@ -15,14 +15,14 @@ DB_NAME = "./data.db"
 """
 コントラクト設定
 """
-"""
+
 config = configparser.ConfigParser()
 config.read('./config.ini')
 contractAddress = config.get('contract', 'contract_address')
 abi = config.get('contract', 'abi')
 abiJson = json.loads(abi)
 infra = config.get('eth', 'infra')
-"""
+
 
 app = Flask(__name__)
 
