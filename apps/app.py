@@ -48,9 +48,9 @@ def index():
     """
     # 動画リストを取得
     path = Path("/usr/local/nginx/html/hls")
-    args = path.glob('*.m3u8')
+    playlists = list(path.glob('*.m3u8'))
 
-    return render_template('index.html', args = args)
+    return render_template('index.html', playlists=playlists)
 
 
 """
