@@ -9,9 +9,6 @@ from pathlib import Path
 """
 DB_NAME = "./data.db"
 
-
-
-
 app = Flask(__name__)
 
 """
