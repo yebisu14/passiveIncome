@@ -2,7 +2,7 @@
 
 from flask import Flask, render_template, request
 import sqlite3
-
+from pathlib import Path
 
 """
 定数
@@ -35,6 +35,7 @@ app.jinja_options = jinja_options
 """
 @app.route('/')
 def index():
+    """
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     args = []
@@ -47,8 +48,24 @@ def index():
             }
         )
     conn.close()
+    """
+    # 動画リストを取得
+    path = Path("/usr/local/nginx/html/hls")
+    args = path.glob('*.m3u8')
+
     return render_template('index.html', args = args)
 
+
+"""
+マイページを表示する
+"""
+@app.route('/mypage')
+def mypage():
+    data = {
+        'abi': abi,
+        'contract_address': contractAddress
+    }
+    return render_template('mypage.html', data=data)
 
 
 """

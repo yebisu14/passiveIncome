@@ -11,6 +11,7 @@
 
 ## 2.nginxの設定
 - nginx.confに、rtmp配信サーバの設定を追記する
+- pullで設定
 
 ```
 rtmp {
@@ -52,7 +53,7 @@ http{
 
 
 
-## 3.アプリケーションのインストール
+## 3.アプリケーションの実行
 
 ```
 $ git clone 
@@ -87,4 +88,44 @@ $ make
 $ sudo make install
 ```
 
-- コマンド実行
+- nginxを入れる(1.14.0を使用)
+
+```
+wget http://nginx.org/download/nginx-1.8.0.tar.gz
+sudo wget http://nginx.org/download/nginx-1.8.0.tar.gz
+tar -zxvf nginx-1.8.0.tar.gz
+wget https://github.com/arut/nginx-rtmp-module/archive/master.zip
+unzip master.zip
+wget https://www.openssl.org/source/openssl-1.1.0f.tar.gz
+tar xzvf openssl-1.1.0f.tar.gz
+
+cd nginx-1.8.0
+./configure --with-http_ssl_module --add-module=../nginx-rtmp-module-master
+make
+make install
+```
+
+- nginxの設定
+
+```
+rtmp {
+   server {
+      listen 1935;
+      chunk_size 4096;
+
+      application live {
+         live on;
+         record off;
+      }
+   }
+}
+```
+
+- 自身のrtmpサーバにgstremaerで配信
+
+```
+$ gst-launch-1.0 rpicamsrc preview=0 bitrate=1000000 ! video/x-h264, width=1920, height=1080, framerate='30/1' ! h264parse ! flvmux ! rtmpsink location='rtmp://0.0.0.0/live/test'
+```
+
+
+
