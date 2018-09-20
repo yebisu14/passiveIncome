@@ -49,11 +49,11 @@ def index():
     # 動画リストを取得
     path = Path("/usr/local/nginx/html/hls")
     playlists = []
-    for playlist in list(path.glob('*.m3u8'))
+    for playlist in list(path.glob('*.m3u8')):
         playlists.append({
             'key': playlist.stem
         })
-        
+
     return render_template('index.html', playlists=playlists)
 
 
