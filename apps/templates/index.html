@@ -65,7 +65,7 @@
             <span class="label-live">LIVE</span>
             <img class="thumbnail" src="static/img/thumbnails/20180911_155441.jpg" alt="">
             <p class="label-title">東京タワーを見る動画</p>
-            <a href="/watch?key=test"></a>
+            <a href="#" id="a_tag"></a>
           </div>
 
 
@@ -95,12 +95,42 @@
     <script src="static/vendor/jquery/jquery.min.js"></script>
     <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="static/js/uuid.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>-->
+    <script src="static/js/app.js"></script>
+
     <script>
       $(()=>{
+        // 現在の残高を表示する
         var myAddress = web3.eth.defaultAccount;
         web3.eth.getBalance(myAddress, function(err, balance){
           $('#balance').html(balance.c[0]/10000);
-        });    
+        });
+
+        //  uuid保存
+        function saveUuid(to, u4){
+          var reciepts = JSON.parse(localStorage.getItem("reciepts")) || [];
+          reciepts.push({
+            uuid: u4,
+            addr: to
+          });
+          localStorage.setItem("reciepts", JSON.stringify(reciepts));
+        }
+
+        //  購入処理を走らせる
+        //  現状いいコールバックが見当たらないので、こんな実装にしてしまった
+        $('#a_tag').on('click', ()=>{
+          var u4 = uuid4();
+          var to = '0x8de894ec4a1102e43cc33039d28de0b011bd2d5a'
+          buyMovieOnContract(to, u4, 
+            result=>{
+              saveUuid(to, u4);
+              console.log("saved");
+              alert("購入成功");
+            }, 
+            err=>console.log);
+        });
+
+
       });
     </script>
 

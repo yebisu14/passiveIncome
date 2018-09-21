@@ -22,19 +22,10 @@
     <div class="container" id="app">
       
       <h1>購入履歴</h1>
-
-      <div class="movie-row" v-on:click="watch(index)" v-for="(metadata, index) in metadatas">
-        <div class="movie-thumbnail">
-          <img :src="metadata.thumbnail">
-        </div>
-        <div class="flexbox">
-          <div class="movie-title">{{metadata.name}}</div>
-          <div class="movie-description">{{metadata.description}}</div>
-          <span class="movie-price">0.1 ETH</span>
-          <span class="movie-expire">2999/12/31 まで視聴可能</span>
-        </div>
-      </div>
-
+      <ul v-for="reciept in reciepts">
+        <li><a href="/watch?key=test">{{ reciept.addr }}</a></li>
+      </ul>
+      
     </div>
 
     <script src="static/vendor/jquery/jquery.min.js"></script>
@@ -45,30 +36,12 @@
       var app2 = new Vue({
         el: '#app',
         data: {
-          metadatas: [],
-          message: "test"
+          reciepts: []
         },
         methods: {
-          watch: function(index){
-            var uuid = this.metadatas[index].uuid;
-            var addr = this.metadatas[index].addr;
-            location.href = "/watch?uuid="+uuid+"&addr="+addr;
-          }
         },
         mounted(){
-          var reciepts = JSON.parse(localStorage.getItem("reciepts")) || [];
-          reciepts.forEach((reciept)=>{
-            axios.get('/get_meta?addr='+reciept.addr)
-            .then(response=>{
-              this.metadatas.push({
-                uuid: reciept.uuid,
-                addr: reciept.addr,
-                name: response.data.name,
-                description: response.data.description,
-                thumbnail: 'static/img/thumbnails/'+response.data.thumbnail
-              });
-            });
-          });
+          this.reciepts = JSON.parse(localStorage.getItem("reciepts")) || [];
         }
       });
 

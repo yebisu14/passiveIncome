@@ -15,14 +15,15 @@ DB_NAME = "./data.db"
 """
 コントラクト設定
 """
-
 config = configparser.ConfigParser()
 config.read('./config.ini')
 contractAddress = config.get('contract', 'contract_address')
 abi = config.get('contract', 'abi')
 abiJson = json.loads(abi)
 infra = config.get('eth', 'infra')
-
+web3 = Web3(HTTPProvider(infra))
+addr = Web3.toChecksumAddress(contractAddress)
+contract = web3.eth.contract(abi = abiJson, address = addr)
 
 app = Flask(__name__)
 
@@ -39,23 +40,6 @@ jinja_options.update({
     'comment_end_string': '#>'                  
 })                                                                               
 app.jinja_options = jinja_options    
-
-"""
-キャッシュしない設定
-"""
-@app.context_processor
-def override_url_for():
-    return dict(url_for=dated_url_for)
-
-def dated_url_for(endpoint, **values):
-    if endpoint == 'static':
-        filename = values.get('filename', None)
-        if filename:
-            file_path = os.path.join(app.root_path,
-                                     endpoint, filename)
-            values['q'] = int(os.stat(file_path).st_mtime)
-    return url_for(endpoint, **values)
-
 
 """
 今オープンになっている動画一覧を返す
@@ -77,7 +61,8 @@ def index():
         )
     conn.close()
     """
-    # 動画リストを取得
+    # 現在放映中の動画リストを取得
+    # 今は使っていない
     path = Path("/usr/local/nginx/html/hls")
     playlists = []
     for playlist in list(path.glob('*.m3u8')):
@@ -85,7 +70,7 @@ def index():
             'key': playlist.stem
         })
 
-    return render_template('index.html', playlists=playlists)
+    return render_template('index.html', playlists=playlists, abi=abi, contractAddress=contractAddress)
 
 
 """
@@ -106,10 +91,20 @@ HLSストリーミングを表示する
 """
 @app.route('/watch')
 def watch():
+    # 購入チェック
+    #    if not contract.functions.verifyPurchase(uuid_purchase, walletAddress).call():
+        
     key = request.args.get("key", type=str)
     return render_template('watch.html', key=key)
 
-
+    # 購入されていない場合は購入画面へリダイレクト
+    
+"""
+購入一覧
+"""
+@app.route('/histories')
+def histories():
+    return render_template('histories.html')
 
 
 
