@@ -17,10 +17,12 @@
     <link href="static/css/thumbnail-gallery.css" rel="stylesheet">
 
     <link href="static/css/common.css" rel="stylesheet">
+    <link href="static/css/index.css" rel="stylesheet">
 
   </head>
 
   <body>
+  <div id="app">
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -65,7 +67,7 @@
             <span class="label-live">LIVE</span>
             <img class="thumbnail" src="static/img/thumbnails/1.jpg" alt="">
             <p class="label-title">鳥が巣を作りました。</p>
-            <a href="#" id="a_tag"></a>
+            <a href="#" id="a_tag" v-on:click="onClickThumbnail"></a>
           </div>
 
           <!-- 猫を見る動画 -->
@@ -104,15 +106,83 @@
       <!-- /.container -->
     </footer>
 
+
+    <!-- loading bar -->
+    <div class="dialog" v-if="processing">
+      <img src="static/img/loading.gif" width="100px" height="100px">
+    </div>
+
+  </div> <!-- end app -->
+
     <!-- Bootstrap core JavaScript -->
     <script src="static/vendor/jquery/jquery.min.js"></script>
     <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="static/js/uuid.js"></script>
     <!--<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>-->
     <script src="static/js/eth.js"></script>
-    <script src="static/js/BalanceWatchdog.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
 
     <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          balance: '---',
+          timer: null,
+          processing: false,
+        },
+        methods: {
+          /* 残高が変化した時にhookされる */
+          hook: function(){
+            this.processing = false;
+            window.location.href="/watch?key=test";
+          },
+
+          /* 動画がクリックされた時に呼ばれる */
+          onClickThumbnail: function(){
+            //  購入処理中はブラックアウト
+            //  購入処理
+            var u4 = uuid4();
+            var to = '0x8de894ec4a1102e43cc33039d28de0b011bd2d5a'
+            buyMovieOnContract(to, u4, result=>{
+              //saveUuid(to, u4);
+              //  残高監視スタート
+              this.processing = true;
+              this.initWatchdog();
+            });
+          },
+
+          /* 残高の変化をチェックするための関数 */
+          initWatchdog: function(){
+            timer = setInterval(this.tick, 1000);
+          },
+          tick: function(){
+            var that = this;
+            var myAddress = web3.eth.defaultAccount;
+            web3.eth.getBalance(myAddress, (err, balance)=>{
+              var current = balance.c[0]/10000;
+              if(current!=that.balance){
+                this.stopWatchdog();
+                this.hook();
+              }
+            });
+          },
+          stopWatchdog: function(){
+            clearInterval(timer);
+          }
+          
+        },
+        mounted(){
+          var myAddress = web3.eth.defaultAccount;
+          var that = this;
+          web3.eth.getBalance(myAddress, (err, balance)=>{
+            that.balance = balance.c[0]/10000;
+          });
+          
+        }
+      });
+
 
       $(()=>{
         // 現在の残高を表示する
@@ -145,12 +215,6 @@
             }, 
             err=>console.log);
             */
-           var watchdog = new BalanceWatchdog(myAddress, ()=>{
-            console.log("Success");
-           }, ()=>{
-            console.log("timeout");
-           });
-
         });
 
         //  30秒間自分のアドレスを見に行き、お金が減っていたら処理が終わったことにする
@@ -160,6 +224,7 @@
       });
     </script>
 
-  </body>
 
+  
+  </body>
 </html>

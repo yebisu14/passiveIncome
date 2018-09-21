@@ -1,0 +1,29 @@
+/*
+    for inedex.html
+*/
+
+body{
+    width: 100%;
+    height: 100%;
+}
+
+.dialog{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background: #000000dd;
+    z-index: 1000;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    
+}
+
+
+.dialog p{
+    color: white;
+}
