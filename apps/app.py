@@ -107,6 +107,11 @@ def histories():
     return render_template('histories.html')
 
 
+"""
+ウォレットアドレスから動画キーを引く
+"""
+
+
 
 if __name__ == '__main__':
     app.run()

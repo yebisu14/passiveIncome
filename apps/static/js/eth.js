@@ -18,3 +18,32 @@ function buyMovieOnContract(to, u4, onSuccess, onError){
         }
     });
 }
+
+function getDepositedBalanceInEthOnContract(onSuccess, onError){
+    var myAddress = web3.eth.defaultAccount;
+    
+    contract.getDepositedBalance(myAddress, function(err, balance){
+        if(err){
+            onError(err);   
+        }else{
+            var n = web3.fromWei(balance, "ether");
+            onSuccess(n);
+        }
+    });
+
+}
+
+function withdrawOnContract(onSuccess, onError){
+    /* withdrawコントラクトの発行 */
+    contract.withdraw(function(err, result){
+        if(err){
+            onError(err);
+        }else{
+            onSuccess(result);
+        }
+    });
+}
+
+
+
+

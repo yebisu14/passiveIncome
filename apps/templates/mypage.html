@@ -21,20 +21,20 @@
 
   <body>
 
-    <div class="container">
+    <div class="container" id="app">
       <h1>マイページ（デバイス登録ページ）</h1><br>
 
       <form action="/register_meta" method="POST" enctype="multipart/form-data">
         <div class="form-group">
           <label for="addr">口座アドレス</label>
-          <input type="text" class="form-control" id="addr" aria-describedby="emailHelp" placeholder="Your wallet address" disabled>
+          <input type="text" class="form-control" id="addr" aria-describedby="emailHelp" placeholder="Your wallet address" disabled v-model="myAddress">
           <small id="emailHelp" class="form-text text-muted">ここで指定したアドレスに動画配信報酬が振り込まれます。</small>
-          <input type="hidden" id="hiddenAddr" name="addr">
+          <input type="hidden" id="hiddenAddr" name="addr" v-model="myAddress">
         </div>
         <div class="form-group">
           <label for="uri">配信キー</label>
           <input type="text" class="form-control" name="uri" id="uri" aria-describedby="emailHelp" placeholder="URL" required>
-          <small id="emailHelp" class="form-text text-muted">配信が閲覧可能なURLを指定してください。</small>
+          <small id="emailHelp" class="form-text text-muted">キーの値をラズベリーパイに設定してください。</small>
         </div>
         <div class="form-group">
           <label for="name">配信中の動画名</label>
@@ -47,10 +47,6 @@
           <small id="emailHelp" class="form-text text-muted">配信中の動画を説明してください。</small>
         </div>
         <div class="form-group">
-            <label for="thumbnail">サムネイル</label>
-            <img src="" id="thumbnail" class="thumbnail">
-        </div>
-        <div class="form-group">
           <input type="file" value="ファイルを選択" name="thumbnail">
         </div>
         <button type="submit" class="btn btn-primary">Apply</button>
@@ -60,7 +56,7 @@
 
       <div>
           <p>サービス預かり残高</p>
-          <p><span id="deposit">---</span> ETH</p>
+          <p><span id="deposit">{{ myDeposit }}</span> ETH</p>
           <button id="withdraw" class="btn btn-primary">Withdraw</button>
       </div>
 
@@ -73,54 +69,53 @@
     -->
     <input type="hidden" id="contractAddress" value='<< data.contract_address >>' />
 
-
     <script src="static/vendor/jquery/jquery.min.js"></script>
     <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script src="static/js/eth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
     <script>
       
-      $(()=>{
-        /* コントラクト初期化 */
-        //var abi = $('#abi').val();
-        //var abiJson = JSON.parse(abi);
-        var abiJson = [{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"uuid","type":"string"}],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"getDepositedBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"deviceWalletAddress","type":"address"}],"name":"addDevice","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"isBroadcastable","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"purchaseUuid","type":"string"},{"name":"walletAddress","type":"address"}],"name":"verifyPurchase","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}]
-        //console.log(abiJson);
-        var contractAddress = $('#contractAddress').val();
-        var contract = web3.eth.contract(abiJson).at(contractAddress);
+      var app = new Vue({
+        el: '#app',
+        data: {
+          myAddress: null,
+          myDeposit: "---"
+        },
+        methods: {
+          
+          /* コントラクト上のお金から自分のお金を引き出す */
+          withdraw: function(){
+            withdrawOnContract(
+              result=>console.log, 
+              err=>console.log
+            );
+          },
+          
+          /* データベースに更新されたデータを投げる */
+          postQuery: function(){
 
-        /* 自分のアドレスを取得 */
-        var myAddress = web3.eth.defaultAccount;
-        $('#addr').val(myAddress);
-        $('#hiddenAddr').val(myAddress);
+          }
 
-        /* 預け金を取得する */
-        contract.getDepositedBalance(myAddress, function(err, balance){
-          var n = web3.fromWei(balance, "ether");
-          $('#deposit').text(n);
-        });
-        
-        /* 配信中のメタデータを取得する */
-        $.get('/get_meta', {addr: myAddress}, (data)=>{
-          console.log(data);
-          $('#description').val(data.description);
-          $('#name').val(data.name);
-          $('#uri').val(data.uri);
-          $('#thumbnail').attr('src', '/static/img/thumbnails/'+data.thumbnail);
-        });
+          /* アドレスに紐づく配信キーを設定する */
+          
 
-        /* withdrawコントラクトの発行 */
-        $('#withdraw').on('click', ()=>{
-          contract.withdraw(function(err, result){
-            if(err){
-              console.log(err);
-              return;
-            }
-            location.reload();
-          });
-        });
+        },
+        mounted(){
+          /* 自分のアドレスを取得 */
+          this.myAddress = web3.eth.defaultAccount;
+          /* 預け金を取得 */
+          getDepositedBalanceInEthOnContract(
+            balance=>{
+              this.myDeposit = Number(balance);
+            },
+            err=>console.log
+          );  
+        }
 
-        /* アドレスから配信アドレス等のデータを取得する */
-      });
-
+      }); 
 
     </script>
 

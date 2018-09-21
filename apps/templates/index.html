@@ -63,20 +63,33 @@
           <!-- 東京タワーを見る動画 -->
           <div class="col-lg-3 col-md-4 col-xs-6 wrapper-thumbnail wrapper-a">
             <span class="label-live">LIVE</span>
-            <img class="thumbnail" src="static/img/thumbnails/20180911_155441.jpg" alt="">
-            <p class="label-title">東京タワーを見る動画</p>
+            <img class="thumbnail" src="static/img/thumbnails/1.jpg" alt="">
+            <p class="label-title">鳥が巣を作りました。</p>
             <a href="#" id="a_tag"></a>
           </div>
-
 
           <!-- 猫を見る動画 -->
           <div class="col-lg-3 col-md-4 col-xs-6 wrapper-thumbnail">
             <span class="label-live">LIVE</span>
-            <img class="thumbnail" src="static/img/thumbnails/20180911_155441.jpg" alt="">
-            <p class="label-title">猫を見る動画</p>
+            <img class="thumbnail" src="static/img/thumbnails/2.jpg" alt="">
+            <p class="label-title">花火を見る動画。</p>
           </div>
-  
 
+          <!-- 猫を見る動画 -->
+          <div class="col-lg-3 col-md-4 col-xs-6 wrapper-thumbnail">
+              <span class="label-live">LIVE</span>
+              <img class="thumbnail" src="static/img/thumbnails/3.jpg" alt="">
+              <p class="label-title">猫が癒してくれる動画。</p>
+            </div>        
+        
+          <!-- 猫を見る動画 -->
+          <div class="col-lg-3 col-md-4 col-xs-6 wrapper-thumbnail">
+              <span class="label-live">LIVE</span>
+              <img class="thumbnail" src="static/img/thumbnails/4.jpg" alt="">
+              <p class="label-title">海の様子。</p>
+            </div>
+            
+            
         </div>
 
 
@@ -96,9 +109,11 @@
     <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="static/js/uuid.js"></script>
     <!--<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>-->
-    <script src="static/js/app.js"></script>
+    <script src="static/js/eth.js"></script>
+    <script src="static/js/BalanceWatchdog.js"></script>
 
     <script>
+
       $(()=>{
         // 現在の残高を表示する
         var myAddress = web3.eth.defaultAccount;
@@ -119,6 +134,7 @@
         //  購入処理を走らせる
         //  現状いいコールバックが見当たらないので、こんな実装にしてしまった
         $('#a_tag').on('click', ()=>{
+          /*
           var u4 = uuid4();
           var to = '0x8de894ec4a1102e43cc33039d28de0b011bd2d5a'
           buyMovieOnContract(to, u4, 
@@ -128,7 +144,17 @@
               alert("購入成功");
             }, 
             err=>console.log);
+            */
+           var watchdog = new BalanceWatchdog(myAddress, ()=>{
+            console.log("Success");
+           }, ()=>{
+            console.log("timeout");
+           });
+
         });
+
+        //  30秒間自分のアドレスを見に行き、お金が減っていたら処理が終わったことにする
+        
 
 
       });
