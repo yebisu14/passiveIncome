@@ -125,12 +125,13 @@ GET /api/thumbnails?key=[movie_key]
     img64: [base64_encoded_str]
 }
 """
-@app.route('/api/get_thumbnails')
-def get_thumbnails():
+@app.route('/api/get_thumbnail')
+def get_thumbnail():
     key = request.args.get("key", type=str)
     url = 'rtmp://localhost/live/' + key
     streamIn = ffmpeg.input(url, ss=1, vframes=1, movflags='faststart' )
-    streamOut = ffmpeg.output(streamIn, f='image2 /home/ubuntu/tmp/testtest.jpg')
+    #streamOut = ffmpeg.output(streamIn, f='image2 /home/ubuntu/tmp/testtest.jpg')
+    streamOut = ffmpeg.output(streamIn, '/home/ubuntu/tmp/testtest.jpg' f='image2')
     ffmpeg.run(streamOut)
 
     img64 = "data:image/jpeg;base64," + "OK" 
