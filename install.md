@@ -1,3 +1,10 @@
+# ハマったことメモ
+- web3.jsのバージョンは1.0.0ではなく、0.20.6なので注意。コールバックの書き方が若干違う。
+- pull型だと動画キーの設定ができない。(動的に設定する方法があるのか不明)。
+
+
+
+
 # サーバインストールメモ
 
 ## 1.nginxのインストール
@@ -5,13 +12,14 @@
 - nginx-rtmp-moduleをダウンロード
 - モジュールを有効にしてコンパイルする
 
-- /etc/local/nginx/ ルート
-- /etc/local/sbin/nginx バイナリの場所
-- /etc/local/conf/nginx.conf 設定ファイルの場所
+- /usr/local/nginx/ ルート
+- /usr/local/nginx/sbin/nginx バイナリの場所
+- /usr/local/nginx/conf/nginx.conf 設定ファイルの場所
+- /usr/local/nginx/html/rec flv形式で録画されたデータ
+- /usr/local/nginx/html/thumbnails 切り出したサムネイル画像
 
 ## 2.nginxの設定
 - nginx.confに、rtmp配信サーバの設定を追記する
-- pullで設定
 
 ```
 rtmp {
@@ -22,15 +30,49 @@ rtmp {
       application live {
         live on;
         hls on;
-        
         hls_path /usr/local/nginx/html/hls;
         hls_fragment 1s;
-        hls_type live;   
+        hls_type live;  
+
+        # hls動画をflvとして保存する
+        record all;
+        record_path /usr/local/nginx/html/rec;
+        record_suffix -%Y%m%d%H%M%S.flv;
+
+        # サムネイルを登録
+        exec_done_record ffmpeg i- $path -ss 1 -t 1 -r 1 image2 test.jpg
+
+        # pullの場合は下記を設定
+        # pull rtmp://path/to/hls 
       }
   }
     
 }
 ```
+
+- フォルダの権限変更も忘れずに
+- 744じゃないと動かないっぽい
+
+```
+$ sudo mkdir /usr/local/nginx/html/rec
+$ sudo chown nobody /usr/local/nginx/html/rec
+$ sudo chmod 744 /usr/local/nginx/html/rec
+```
+
+- ffmpegはこの辺りを参考に
+- https://qiita.com/matoken/items/664e7a7e8f31e8a46a60
+
+
+
+```
+-i 元動画.avi : 元動画
+-ss 144 : 抜き出し始点(秒)
+-t 148 : 抜き出し終点(秒)
+-r 24 : 1秒あたり何枚抜き出すか
+-f image2 %06d.jpg : jpeg で[000001.jpg]から連番で書き出し
+```
+
+
 
 - nginx.confに、uwsgi経由でflaskを動かす設定をする
 - hlsフォルダを見えるようにする
@@ -51,9 +93,35 @@ http{
         }
 ```
 
+## 3.pythonのセットアップ
+
+- pipを入れる
+- pyenvを入れる(pythonは3.5以上でないとweb3が動かない)
+
+```
+$ pip3 install web3
+$ pip3 install flask
+```
+
+```
+git clone https://github.com/yyuu/pyenv.git ~/.pyenv
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+- 3.7.0のインストール
+
+```
+sudo apt install libffi-dev
+pyenv install 3.7.0
+pyenv global 3.7.0
+pyenv rehash
+```
 
 
-## 3.アプリケーションの実行
+## 4.アプリケーションの実行
 
 ```
 $ git clone 

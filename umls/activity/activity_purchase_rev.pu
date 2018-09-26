@@ -1,0 +1,41 @@
+@startuml activity_purchase
+title 購入から視聴まで
+
+|BackEnd|
+start
+:レシートを作成する;
+:レシートをブロックチェーン上に記録する;
+
+fork
+    while (ブロックチェーン上に書き込まれた\nor タイムアウト)
+        :自分の残高を見に行く;
+        note left
+            残高が変化していれば、
+            書き込まれている。
+        endnote
+    endwhile
+|FrontEnd|
+fork again
+    :動画をロードする;
+    :動画を表示する;
+    note left
+        先に動画を流しておく
+    endnote
+end fork
+
+|BackEnd|
+if (Result) then(Timeout)
+    |FrontEnd|
+    :動画を停止する;
+    note right
+        エラーがあった場合のみ停止
+    endnote
+else (OK)
+    |BackEnd|
+    stop
+endif
+
+|BackEnd|
+stop
+
+@enduml
