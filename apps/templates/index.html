@@ -150,14 +150,14 @@
               //saveUuid(to, u4);
               //  残高監視スタート
               this.processing = true;
-              if(debug) this.initWatchdog();
-              else this.initDummyWatchdog();
+              if(this.debug) this.initDummyWatchdog();
+              else this.initWatchdog();
             });
           },
 
           /* 残高の変化をチェックするための関数 */
           initWatchdog: function(){
-            timer = setInterval(this.tick, 1000);
+            this.timer = setInterval(this.tick, 1000);
           },
           /* 残高の変化があまりにも遅すぎるので騙すやつ */
           initDummyWatchdog: function(){
@@ -179,7 +179,7 @@
           },
           stopWatchdog: function(){
             clearInterval(this.timer);
-            this.timer = null;
+            //this.timer = null;
           }
           
         },
