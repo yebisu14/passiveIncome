@@ -142,7 +142,9 @@ def get_thumbnail():
     #ffmpeg.run(streamOut)
 
     path = "/home/ubuntu/tmp/" + key + ".jpg"
-    subprocess.run(['ffmpeg', '-i', url, '-movflags faststart', '-ss 1', '-vframes 1', '-f image2', path], stdout=subprocess.PIPE)
+    cmd = 'ffmpeg -i %s -movflags faststart -ss 1 -vframes 1 -f image2 %s' % (url, path, )
+
+    subprocess.run([cmd], stdout=subprocess.PIPE)
     img64 = "data:image/jpeg;base64," +  base64.encodestring(open(path, 'rb').read())
     
     return img64
