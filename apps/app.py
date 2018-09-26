@@ -6,6 +6,7 @@ from pathlib import Path
 from web3 import Web3, HTTPProvider
 import configparser
 import json
+import ffmpeg
 
 """
 定数
@@ -69,10 +70,6 @@ def index():
         playlists.append({
             'key': playlist.stem
         })
-    
-    # サムネイル一覧を取得
-    # その動画に対応する、切り出したjpg画像リストを取って来る
-    path = Path("/home/ubuntu/passiveIncome/apps/static/thubmnails/*.jpg")
 
     return render_template('index.html', playlists=playlists, abi=abi, contractAddress=contractAddress)
 
@@ -111,9 +108,34 @@ def histories():
     return render_template('histories.html')
 
 
+######################################################################
+#
+#   ここからAPI
+#
+#
+########################################################################
+
 """
-ウォレットアドレスから動画キーを引く
+動画のサムネイルをbase64で取得する
+GET /api/thumbnails?key=[movie_key]
+ストリーミングのキーを指定します
+
+レスポンスサンプル(json)
+{
+    img64: [base64_encoded_str]
+}
 """
+@app.route('/api/get_thumbnails')
+def get_thumbnails():
+    key = request.args.get("key", type=str)
+    url = 'rtmp://localhost/live/' + key
+    streamIn = ffmpeg.input(url, ss=1, vframes=1, movflags='faststart' )
+    streamOut = ffmpeg.output(streamIn, f='image2 /home/ubuntu/tmp/testtest.jpg')
+    ffmpeg.run(streamOut)
+
+    img64 = "data:image/jpeg;base64," + "OK" 
+    
+    return img64
 
 
 
