@@ -6,7 +6,7 @@ from pathlib import Path
 from web3 import Web3, HTTPProvider
 import configparser
 import json
-import ffmpeg
+#import ffmpeg
 
 """
 定数
@@ -124,17 +124,26 @@ GET /api/thumbnails?key=[movie_key]
 {
     img64: [base64_encoded_str]
 }
+
+
+ffmpeg-pythonはうまくいかないのでexecでごり押しした
 """
+
+import subprocess
+import base64
+
 @app.route('/api/get_thumbnail')
 def get_thumbnail():
     key = request.args.get("key", type=str)
     url = 'rtmp://localhost/live/' + key
-    streamIn = ffmpeg.input(url)
+    #streamIn = ffmpeg.input(url)
     #streamOut = ffmpeg.output(streamIn, f='image2 /home/ubuntu/tmp/testtest.jpg')
-    streamOut = ffmpeg.output(streamIn, '/home/ubuntu/tmp/testtest.jpg', f='image2', ss=1, vframes=1, movflags='faststart')
-    ffmpeg.run(streamOut)
+    #streamOut = ffmpeg.output(streamIn, '/home/ubuntu/tmp/testtest.jpg', f='image2', ss=1, vframes=1, movflags='faststart')
+    #ffmpeg.run(streamOut)
 
-    img64 = "data:image/jpeg;base64," + "OK" 
+    path = "/home/ubuntu/tmp/" + key + ".jpg"
+    subprocess.run(['ffmpeg', '-i', url, '-moveflags faststart', '-ss', 1, '-vframes', 1, '-f image2', path], stdout=subprocess.PIPE)
+    img64 = "data:image/jpeg;base64," +  base64.encodestring(open(path, 'rb').read())
     
     return img64
 

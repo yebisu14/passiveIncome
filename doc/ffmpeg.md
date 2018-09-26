@@ -42,5 +42,10 @@ ffmpeg -i $path -moveflags faststart -ss 1 -vframes 1 -f image2 /home/ubuntu/pas
 
 
 ```
-$ffmpeg -i http://13.231.137.35/live/test -movflags faststart -ss 1 -vframes 1 -f image2 ~/test.jpg
+$ffmpeg -i rtmp://13.231.137.35/live/test -movflags faststart -ss 1 -vframes 1 -f image2 ~/test.jpg
+```
+
+- AWSでも叩いてみる
+```
+$ffmpeg -i rtmp://localhost/live/test -movflags faststart -ss 1 -vframes 1 -f image2 ~/test.jpg
 ```
