@@ -27,7 +27,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <a class="navbar-brand" href="#">動画共有サービス</a>
+        <a class="navbar-brand" href="#">動画共有サービス <span v-if="debug">[デバッグモード]</span></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -131,6 +131,7 @@
           balance: '---',
           timer: null,
           processing: false,
+          debug: true,
         },
         methods: {
           /* 残高が変化した時にhookされる */
@@ -149,7 +150,8 @@
               //saveUuid(to, u4);
               //  残高監視スタート
               this.processing = true;
-              this.initWatchdog();
+              if(debug) this.initWatchdog();
+              else this.initDummyWatchdog();
             });
           },
 
@@ -157,6 +159,13 @@
           initWatchdog: function(){
             timer = setInterval(this.tick, 1000);
           },
+          /* 残高の変化があまりにも遅すぎるので騙すやつ */
+          initDummyWatchdog: function(){
+            setTimeout(()=>{
+              this.hook();
+            }, 4000);
+          },
+
           tick: function(){
             var that = this;
             var myAddress = web3.eth.defaultAccount;
@@ -169,7 +178,8 @@
             });
           },
           stopWatchdog: function(){
-            clearInterval(timer);
+            clearInterval(this.timer);
+            this.timer = null;
           }
           
         },

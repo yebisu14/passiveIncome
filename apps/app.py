@@ -69,6 +69,10 @@ def index():
         playlists.append({
             'key': playlist.stem
         })
+    
+    # サムネイル一覧を取得
+    # その動画に対応する、切り出したjpg画像リストを取って来る
+    path = Path("/home/ubuntu/passiveIncome/apps/static/thubmnails/*.jpg")
 
     return render_template('index.html', playlists=playlists, abi=abi, contractAddress=contractAddress)
 

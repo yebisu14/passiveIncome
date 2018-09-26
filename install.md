@@ -1,6 +1,7 @@
 # ハマったことメモ
 - web3.jsのバージョンは1.0.0ではなく、0.20.6なので注意。コールバックの書き方が若干違う。
 - pull型だと動画キーの設定ができない。(動的に設定する方法があるのか不明)。
+    - $nameでキーを取ってこれるっぽい？
 
 
 
@@ -16,7 +17,7 @@
 - /usr/local/nginx/sbin/nginx バイナリの場所
 - /usr/local/nginx/conf/nginx.conf 設定ファイルの場所
 - /usr/local/nginx/html/rec flv形式で録画されたデータ
-- /usr/local/nginx/html/thumbnails 切り出したサムネイル画像
+- /home/ubuntu/passiveIncome/apps/static/img/thumbnails 切り出したサムネイル画像(index.htmlで表示するため)
 
 ## 2.nginxの設定
 - nginx.confに、rtmp配信サーバの設定を追記する
