@@ -193,7 +193,7 @@ rtmp {
 - 自身のrtmpサーバにgstremaerで配信
 
 ```
-$ gst-launch-1.0 rpicamsrc preview=0 bitrate=1000000 ! video/x-h264, width=1920, height=1080, framerate='30/1' ! h264parse ! flvmux ! rtmpsink location='rtmp://0.0.0.0/live/test'
+$ gst-launch-1.0 rpicamsrc preview=0 bitrate=1300000 ! video/x-h264, width=1920, height=1080, framerate='30/1' ! h264parse ! flvmux ! rtmpsink location='rtmp://13.231.137.35/live/test'
 ```
 
 
