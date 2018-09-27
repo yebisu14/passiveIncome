@@ -6,7 +6,6 @@ from pathlib import Path
 from web3 import Web3, HTTPProvider
 import configparser
 import json
-#import ffmpeg
 
 """
 定数
@@ -131,20 +130,17 @@ ffmpeg-pythonはうまくいかないのでexecでごり押しした
 
 import subprocess
 import base64
+import ffmpeg
 
 @app.route('/api/get_thumbnail')
 def get_thumbnail():
     key = request.args.get("key", type=str)
     url = 'rtmp://localhost/live/' + key
-    #streamIn = ffmpeg.input(url)
-    #streamOut = ffmpeg.output(streamIn, f='image2 /home/ubuntu/tmp/testtest.jpg')
-    #streamOut = ffmpeg.output(streamIn, '/home/ubuntu/tmp/testtest.jpg', f='image2', ss=1, vframes=1, movflags='faststart')
-    #ffmpeg.run(streamOut)
 
     path = "/home/ubuntu/tmp/" + key + ".jpg"
     cmd = 'ffmpeg -i %s -movflags faststart -ss 1 -vframes 1 -f image2 %s' % (url, path, )
 
-    subprocess.run([cmd], stdout=subprocess.PIPE)
+    subprocess.run(cmd.split(' '), stdout=subprocess.PIPE)
     img64 = "data:image/jpeg;base64," +  base64.encodestring(open(path, 'rb').read())
     
     return img64
