@@ -141,7 +141,7 @@ def get_thumbnail():
     cmd = 'ffmpeg -i %s -movflags faststart -ss 1 -vframes 1 -f image2 %s' % (url, path, )
 
     subprocess.run(cmd.split(' '), stdout=subprocess.PIPE)
-    img64 = "data:image/jpeg;base64," +  base64.encodestring(open(path, 'rb').read())
+    img64 = "data:image/jpeg;base64," +  base64.b64encode(open(path, 'rt').read())
     
     return img64
 
